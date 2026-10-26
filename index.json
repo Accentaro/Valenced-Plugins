@@ -1,0 +1,188 @@
+{
+  "format": 1,
+  "name": "Valenced Plugins",
+  "description": "Benjii's selected plugins for Valenced.",
+  "plugins": {
+    "dev.benjii.collapsibleUI": {
+      "name": "collapisbleUI",
+      "description": "Collapse channel headers, the You bar and chat box with drag strips, and the guildbar with swipes.",
+      "author": "Benjii <463702169443368970>",
+      "icon": "SettingsIcon",
+      "channels": {
+        "latest": "0.0.1"
+      },
+      "versions": {
+        "0.0.1": {
+          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.collapsibleUI@0.0.1.zip",
+          "sha256": "86aad7d3e672f0ac027344b70e30e41ac66e87b6461c1067f4f5a5d8c29528fd",
+          "size": 24396,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        }
+      }
+    },
+    "dev.benjii.declutter": {
+      "name": "Declutter",
+      "description": "Hide profile clutter: avatar decorations, nameplates, profile effects, profile frames, server tags, and badges. Customize settings and long-press actions.",
+      "author": "Benjii <463702169443368970>",
+      "contributors": [
+        "kmmiio99o"
+      ],
+      "icon": "MagicWandIcon",
+      "channels": {
+        "latest": "0.0.1"
+      },
+      "versions": {
+        "0.0.1": {
+          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.declutter@0.0.1.zip",
+          "sha256": "0924597d1771314e70e1b8b730ccb8ccd79b88ca174cbe32e2e79e906373d286",
+          "size": 29676,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        }
+      }
+    },
+    "dev.benjii.gtci": {
+      "name": "GIF to Chat Input",
+      "description": "Prevents GIFs from auto-sending from the picker and holds them in the chatbox.",
+      "author": "j <1356632712861192242>",
+      "contributors": [
+        "Benjii <463702169443368970>"
+      ],
+      "icon": "GifIcon",
+      "channels": {
+        "latest": "0.0.1"
+      },
+      "versions": {
+        "0.0.1": {
+          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.gtci@0.0.1.zip",
+          "sha256": "ccad763e1bedfe34ed8b03dc1aabe2564c24a6962705872d6316395c974398ef",
+          "size": 17607,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        }
+      }
+    },
+    "dev.benjii.serverdrawer": {
+      "name": "Server Drawer",
+      "description": "A compact server dock with a searchable server and DM drawer, folders, and drag and drop.",
+      "author": "kmmiio99o, Rosie and Benjii <879393496627306587> <1356936317501571214> <463702169443368970>",
+      "icon": "ServersIcon",
+      "channels": {
+        "latest": "0.0.2"
+      },
+      "versions": {
+        "0.0.2": {
+          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.serverdrawer@0.0.2.zip",
+          "sha256": "24de92e8b214e2deca33fbed88ea499f43c67f7833f0a1ef95044a4399452876",
+          "size": 36506,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        }
+      }
+    },
+    "revenge-next.better-you-bar": {
+      "name": "BetterYouBar",
+      "description": "Adds Favorites and Settings shortcuts to the You bar.",
+      "author": "j <1356632712861192242>",
+      "contributors": [
+        "Benjii <463702169443368970>"
+      ],
+      "icon": "StarIcon",
+      "channels": {
+        "latest": "0.0.1"
+      },
+      "versions": {
+        "0.0.1": {
+          "url": "https://plugins.benjiisworld.com/pool/revenge-next.better-you-bar@0.0.1.zip",
+          "sha256": "245f7e0214833acfbd57db45fc9e561fbf1a989585dffdc9f51cae48a9afaf66",
+          "size": 19321,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        }
+      }
+    },
+    "revenge-next.gif-providers": {
+      "name": "GIF Providers",
+      "description": "Search Tenor, Giphy and Klipy together in the GIF picker.",
+      "author": "Palm <629368283354628116> (https://github.com/sponsors/PalmDevs \"Donations\") (https://palmdevs.me \"Website\") (https://github.com/PalmDevs \"GitHub\")",
+      "contributors": [
+        "Livie <755950362342457384>",
+        "Benjii <463702169443368970>"
+      ],
+      "icon": "GifIcon",
+      "channels": {
+        "latest": "0.0.1"
+      },
+      "versions": {
+        "0.0.1": {
+          "url": "https://plugins.benjiisworld.com/pool/revenge-next.gif-providers@0.0.1.zip",
+          "sha256": "16419ef230d2cd57d9062b3701cd7b2b9cdc55cb9e6f37030a351ad8a1dab085",
+          "size": 22493,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        }
+      }
+    },
+    "revenge-next.quoter": {
+      "name": "Quoter",
+      "description": "Create quote images from messages.",
+      "author": "Benjii <463702169443368970>",
+      "icon": "QuoteIcon",
+      "channels": {
+        "latest": "0.0.1"
+      },
+      "versions": {
+        "0.0.1": {
+          "url": "https://plugins.benjiisworld.com/pool/revenge-next.quoter@0.0.1.zip",
+          "sha256": "ff171dbb729ff6d7719c9bf66738af8a5255ee6aa6183a33bfff9d5083f94907",
+          "size": 36965,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        }
+      }
+    }
+  }
+}
