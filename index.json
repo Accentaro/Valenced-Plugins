@@ -87,13 +87,13 @@
       "author": "kmmiio99o, Rosie and Benjii <879393496627306587> <1356936317501571214> <463702169443368970>",
       "icon": "ServersIcon",
       "channels": {
-        "latest": "0.0.2"
+        "latest": "0.0.1"
       },
       "versions": {
-        "0.0.2": {
-          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.serverdrawer@0.0.2.zip",
-          "sha256": "24de92e8b214e2deca33fbed88ea499f43c67f7833f0a1ef95044a4399452876",
-          "size": 36506,
+        "0.0.1": {
+          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.serverdrawer@0.0.1.zip",
+          "sha256": "a4a31ac9ae5269aa2830f2d5788ec4e7a413941051f13291dcc432796fba5039",
+          "size": 36616,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
