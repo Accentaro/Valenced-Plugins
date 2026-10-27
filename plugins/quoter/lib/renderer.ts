@@ -200,18 +200,13 @@ async function render() {
     if (height > 16384) throw new Error("This quote is too tall for one image. Choose a shorter message.");
     canvas.height = height;
 
+    if (payload.grayscale) ctx.filter = "grayscale(1)";
     ctx.fillStyle = reply ? "#1c1d22" : "#000";
     ctx.fillRect(0, 0, cfg.width, height);
 
     if (!reply) {
         const avatar = await loadAvatar(payload.avatarUrl);
         ctx.drawImage(avatar, 0, (height - cfg.height) / 2, cfg.height, cfg.height);
-        if (payload.grayscale) {
-            ctx.globalCompositeOperation = 'saturation';
-            ctx.fillStyle = '#fff';
-            ctx.fillRect(0, 0, cfg.width, height);
-            ctx.globalCompositeOperation = 'source-over';
-        }
         const gradient = ctx.createLinearGradient(cfg.height - sp.gradientWidth, 0, cfg.height, 0);
         gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
         gradient.addColorStop(1, 'rgba(0, 0, 0, 1)');

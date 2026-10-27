@@ -1,12 +1,19 @@
 import { FileModule } from '@valenced/discord/native'
 import { lookupModule } from '@valenced/modules/finders'
-import { withProps } from '@valenced/modules/finders/filters'
+import {
+	allOf,
+	withDependencies,
+	withProps,
+} from '@valenced/modules/finders/filters'
 import type { PluginApi } from '@valenced/plugins/types'
 import type { RenderedQuote } from '../types'
 
 type NativeUploadItem = {
 	platform: number
 	uri: string
+	originalUri: string
+	width: number
+	height: number
 	filename: string
 	mimeType: string
 }
@@ -52,20 +59,26 @@ export async function sendQuoteAttachment(
 	const [messages] = lookupModule(
 		withProps<MessageActions>('sendMessage', 'receiveMessage'),
 	)
+	const [, httpId] = lookupModule(withProps('HTTPResponseError', 'get'))
+	if (httpId === undefined)
+		throw new Error('Native attachment uploads are unavailable.')
+	// CloudUpload is lazy until the first attachment. Match its HTTP, Upload and
+	// UploadPlatform dependencies so lookup can initialize it on a fresh launch.
+	const { partial, skip, relative } = withDependencies
 	const [uploads] = lookupModule(
-		withProps<{
-			CloudUpload: new (
-				item: NativeUploadItem,
-				channelId: string,
-				index: number,
-				allowOptimization: boolean,
-			) => CloudUpload
-		}>('CloudUpload'),
+		allOf(
+			withProps<{
+				CloudUpload: new (
+					item: NativeUploadItem,
+					channelId: string,
+					index: number,
+					allowOptimization: boolean,
+				) => CloudUpload
+			}>('CloudUpload'),
+			withDependencies(partial(skip(8, [httpId, relative(1), relative(2)]))),
+		),
 	)
-	const [platform] = lookupModule(
-		withProps<{ UploadPlatform: { REACT_NATIVE: number } }>('UploadPlatform'),
-	)
-	if (!messages || !uploads || !platform)
+	if (!messages || !uploads)
 		throw new Error('Native attachment uploads are unavailable.')
 
 	const extension = mimeType === 'image/gif' ? 'gif' : 'png'
@@ -82,8 +95,11 @@ export async function sendQuoteAttachment(
 		// used by UploadAttachmentStore. Preserve generated PNG/GIF bytes.
 		const upload = new uploads.CloudUpload(
 			{
-				platform: platform.UploadPlatform.REACT_NATIVE,
+				platform: 0, // UploadPlatform.REACT_NATIVE
 				uri,
+				originalUri: uri,
+				width: image.width,
+				height: image.height,
 				filename,
 				mimeType,
 			},

@@ -96,6 +96,7 @@ async function loadMedia(item) {
 }
 async function exportMedia(canvas, media, rectangles, renderId) {
     const ctx = canvas.getContext('2d');
+    const grayscale = ctx.filter === 'grayscale(1)';
     const duration = Math.max(0, ...media.map(item => item.duration));
     const times = new Set([0]);
     for (const item of media) {
@@ -108,6 +109,12 @@ async function exportMedia(canvas, media, rectangles, renderId) {
     if (timeline.length > 600) throw new Error("Combined animation exceeds 600 frames. Quote fewer animated attachments.");
     const gif = duration ? GIF.GIFEncoder() : null;
     let palette;
+    function indexPixels(data) {
+        if (!grayscale) return GIF.applyPalette(data, palette);
+        const pixels = new Uint8Array(data.length / 4);
+        for (let i = 0; i < pixels.length; i++) pixels[i] = data[i * 4];
+        return pixels;
+    }
     let indexed;
     const lastFrames = media.map(() => -1);
     const frameCaches = media.map(() => new Map());
@@ -123,33 +130,37 @@ async function exportMedia(canvas, media, rectangles, renderId) {
             } finally { frame.close(); }
         }));
         post({ type: 'preview', renderId, dataUrl: canvas.toDataURL('image/png'), width: canvas.width, height: canvas.height });
-        // One palette for the entire GIF keeps all static pixels identical between frames.
-        const sample = document.createElement('canvas');
-        sample.width = sample.height = 128;
-        const sampleContext = sample.getContext('2d');
-        sampleContext.drawImage(canvas, 0, 0, 128, 128);
-        const chunks = [sampleContext.getImageData(0, 0, 128, 128).data];
-        sample.width = sample.height = 32;
-        const sampleCount = Math.min(12, timeline.length);
-        for (let index = 0; index < sampleCount; index++) {
-            const time = timeline[Math.round(index * (timeline.length - 1) / Math.max(1, sampleCount - 1))];
-            await Promise.all(media.map(async item => {
-                if (!item.duration && index) return;
-                const frame = await item.frameAt(time);
-                try {
-                    sampleContext.fillStyle = '#000';
-                    sampleContext.fillRect(0, 0, 32, 32);
-                    sampleContext.drawImage(frame.image, 0, 0, 32, 32);
-                    chunks.push(sampleContext.getImageData(0, 0, 32, 32).data);
-                } finally { frame.close(); }
-            }));
-            post({ type: 'progress', renderId, message: 'Preparing animation ' + Math.round((index + 1) / sampleCount * 100) + '%' });
-            await new Promise(resolve => setTimeout(resolve, 0));
+        // Preserve all 256 gray levels instead of the color quantizer's reduced precision.
+        if (grayscale) palette = Array.from({ length: 256 }, (_, value) => [value, value, value]);
+        else {
+            // One palette for the entire GIF keeps all static pixels identical between frames.
+            const sample = document.createElement('canvas');
+            sample.width = sample.height = 128;
+            const sampleContext = sample.getContext('2d');
+            sampleContext.drawImage(canvas, 0, 0, 128, 128);
+            const chunks = [sampleContext.getImageData(0, 0, 128, 128).data];
+            sample.width = sample.height = 32;
+            const sampleCount = Math.min(12, timeline.length);
+            for (let index = 0; index < sampleCount; index++) {
+                const time = timeline[Math.round(index * (timeline.length - 1) / Math.max(1, sampleCount - 1))];
+                await Promise.all(media.map(async item => {
+                    if (!item.duration && index) return;
+                    const frame = await item.frameAt(time);
+                    try {
+                        sampleContext.fillStyle = '#000';
+                        sampleContext.fillRect(0, 0, 32, 32);
+                        sampleContext.drawImage(frame.image, 0, 0, 32, 32);
+                        chunks.push(sampleContext.getImageData(0, 0, 32, 32).data);
+                    } finally { frame.close(); }
+                }));
+                post({ type: 'progress', renderId, message: 'Preparing animation ' + Math.round((index + 1) / sampleCount * 100) + '%' });
+                await new Promise(resolve => setTimeout(resolve, 0));
+            }
+            const samples = new Uint8Array(chunks.reduce((size, chunk) => size + chunk.length, 0));
+            let offset = 0;
+            for (const chunk of chunks) { samples.set(chunk, offset); offset += chunk.length; }
+            palette = GIF.quantize(samples, 256);
         }
-        const samples = new Uint8Array(chunks.reduce((size, chunk) => size + chunk.length, 0));
-        let offset = 0;
-        for (const chunk of chunks) { samples.set(chunk, offset); offset += chunk.length; }
-        palette = GIF.quantize(samples, 256);
     }
     for (let index = 0; index < timeline.length; index++) {
         const changed = [];
@@ -172,7 +183,7 @@ async function exportMedia(canvas, media, rectangles, renderId) {
         }));
         if (gif) {
             const firstFrame = !indexed;
-            if (firstFrame) indexed = GIF.applyPalette(ctx.getImageData(0, 0, canvas.width, canvas.height).data, palette);
+            if (firstFrame) indexed = indexPixels(ctx.getImageData(0, 0, canvas.width, canvas.height).data);
             for (const m of changed) {
                 if (!media[m].duration) continue;
                 const rect = rectangles[m];
@@ -185,7 +196,7 @@ async function exportMedia(canvas, media, rectangles, renderId) {
                             pixels.set(indexed.subarray(start, start + rect.width), row * rect.width);
                         }
                     } else {
-                        pixels = GIF.applyPalette(ctx.getImageData(rect.x, rect.y, rect.width, rect.height).data, palette);
+                        pixels = indexPixels(ctx.getImageData(rect.x, rect.y, rect.width, rect.height).data);
                     }
                     // Bound memory while reusing frames when a shorter animation loops.
                     if (cachedBytes + pixels.byteLength <= 32 * 1024 * 1024) {
