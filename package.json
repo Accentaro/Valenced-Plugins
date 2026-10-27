@@ -1,0 +1,46 @@
+{
+	"name": "@accentaro/valenced-plugins",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "valenced-plugin build",
+		"generate-index": "valenced-plugin generate-index",
+		"plan-releases": "valenced-plugin plan-releases",
+		"lint": "biome lint plugins scripts --error-on-warnings",
+		"lint:types": "tsc --noEmit",
+		"prepare:tools": "node scripts/prepare-tools.mjs",
+		"package": "node scripts/package.mjs"
+	},
+	"dependencies": {
+		"@revenge-mod/devtools-client": "^1.4.0",
+		"@revenge-mod/devtools-shared": "^1.3.0",
+		"@valenced/plugin-cli": "git+https://github.com/Valenced/valenced-plugin-cli.git#c8854005208fa29c0f56eac265fd596320a48713",
+		"@valenced/types": "git+https://github.com/Valenced/valenced-types.git#65cec0388a2865bf779df7b9ab444ccf3fa6e8f0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.5.13",
+		"@react-native-community/netinfo": "^12.0.1",
+		"@shopify/flash-list": "2.3.2",
+		"@types/node": "^26.4.1",
+		"@types/react": "^19.2.18",
+		"fflate": "^0.8.3",
+		"react-native": "0.81.6",
+		"typescript": "^7.0.2"
+	},
+	"overrides": {
+		"@react-native/community-cli-plugin": "npm:dry-uninstall",
+		"@react-native/codegen": "npm:dry-uninstall",
+		"babel-jest": "npm:dry-uninstall",
+		"babel-plugin-syntax-hermes-parser": "npm:dry-uninstall",
+		"hermes-compiler": "npm:dry-uninstall",
+		"jsc-android": "npm:dry-uninstall",
+		"react-devtools-core": "npm:dry-uninstall",
+		"recyclerlistview": "npm:dry-uninstall",
+		"react-native-gesture-handler": "npm:dry-uninstall",
+		"react-native-screens": "npm:dry-uninstall"
+	},
+	"trustedDependencies": [
+		"@valenced/plugin-cli",
+		"@swc/core"
+	]
+}
