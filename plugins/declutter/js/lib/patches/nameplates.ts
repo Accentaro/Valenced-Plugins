@@ -7,15 +7,14 @@ import {
 	safeInsteadJSX,
 } from '../modules'
 import { getSettings } from '../state'
+import type { PluginCleanupApi } from '@valenced/plugins/types'
 
-export function patchNameplates(): () => void {
-	const unpatch: Array<() => void> = []
-
+export function patchNameplates(cleanup: PluginCleanupApi): void {
 	const enabled = () => getSettings().nameplates
 
-	unpatch.push(
+	cleanup(
 		onModule(getPropsFilter('useNameplate'), ns => {
-			unpatch.push(
+			cleanup(
 				safeInstead(ns, 'useNameplate', (args, original) => {
 					const nameplate = original(...args)
 					return enabled() ? null : nameplate
@@ -24,11 +23,11 @@ export function patchNameplates(): () => void {
 		}),
 	)
 
-	unpatch.push(
+	cleanup(
 		onModule(getDefaultNameFilter('Nameplate'), ns => {
 			const component = resolveComponent(ns)
 			if (!component) return
-			unpatch.push(
+			cleanup(
 				safeInsteadJSX(component, (args, jsx) => {
 					if (!enabled()) return jsx(...args)
 					return null
@@ -36,8 +35,4 @@ export function patchNameplates(): () => void {
 			)
 		}),
 	)
-
-	return () => {
-		for (const un of unpatch) un?.()
-	}
 }

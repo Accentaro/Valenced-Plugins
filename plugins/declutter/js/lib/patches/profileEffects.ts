@@ -6,15 +6,14 @@ import {
 	safeInsteadJSX,
 } from '../modules'
 import { getSettings } from '../state'
+import type { PluginCleanupApi } from '@valenced/plugins/types'
 
-export function patchProfileEffects(): () => void {
-	const unpatch: Array<() => void> = []
-
+export function patchProfileEffects(cleanup: PluginCleanupApi): void {
 	const enabled = () => getSettings().profileEffects
 
-	unpatch.push(
+	cleanup(
 		onModule(getDefaultNameFilter('useProfileEffect'), ns => {
-			unpatch.push(
+			cleanup(
 				safeInstead(ns, 'default', (args, original) => {
 					const effect = original(...args)
 					return enabled() ? null : effect
@@ -23,11 +22,11 @@ export function patchProfileEffects(): () => void {
 		}),
 	)
 
-	unpatch.push(
+	cleanup(
 		onModule(getDefaultNameFilter('WrappedProfileEffect'), ns => {
 			const component = resolveComponent(ns)
 			if (!component) return
-			unpatch.push(
+			cleanup(
 				safeInsteadJSX(component, (args, jsx) => {
 					if (!enabled()) return jsx(...args)
 					return null
@@ -35,8 +34,4 @@ export function patchProfileEffects(): () => void {
 			)
 		}),
 	)
-
-	return () => {
-		for (const un of unpatch) un?.()
-	}
 }

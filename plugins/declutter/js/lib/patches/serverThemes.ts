@@ -1,10 +1,9 @@
 import { onImportedPath, safeInstead } from '../modules'
 import { getSettings } from '../state'
+import type { PluginCleanupApi } from '@valenced/plugins/types'
 
-export function patchServerThemes(): () => void {
-	const unpatch: Array<() => void> = []
-
-	unpatch.push(
+export function patchServerThemes(cleanup: PluginCleanupApi): void {
+	cleanup(
 		onImportedPath(
 			'modules/premium/powerups/experiments/ServerThemeUserExperiment.tsx',
 			(
@@ -17,7 +16,7 @@ export function patchServerThemes(): () => void {
 					'getServerThemeUserEnabled',
 					'useServerThemeUserEnabled',
 				] as const)
-					unpatch.push(
+					cleanup(
 						safeInstead(ns, key, function (this: unknown, args, original) {
 							const enabled = Reflect.apply(original, this, args)
 							return getSettings().serverThemes ? false : enabled
@@ -26,8 +25,4 @@ export function patchServerThemes(): () => void {
 			},
 		),
 	)
-
-	return () => {
-		for (const un of unpatch) un?.()
-	}
 }

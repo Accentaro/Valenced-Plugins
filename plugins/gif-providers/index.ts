@@ -28,33 +28,27 @@ import type {
 export default plugin<{ jsonStorage: SettingsData }>({
 	jsonStorage: { default: defaults },
 	SettingsComponent: GifProvidersSettings,
-	async start({ cleanup: registerCleanup, jsonStorage, plugin, logger }) {
-		const patches: (() => void)[] = []
+	async start({ cleanup, jsonStorage, plugin, logger }) {
+		if (plugin.startedLate) {
+			plugin.requireReload()
+			return
+		}
 		const requests = new Map<string, AbortController>()
 		let stopped = false
 		function cancelRequests() {
 			for (const controller of requests.values()) controller.abort()
 			requests.clear()
 		}
-		function cleanup() {
+		cleanup(() => {
 			stopped = true
 			setActive(false)
 			cancelRequests()
-			for (const unpatch of patches.splice(0).reverse()) {
-				try {
-					unpatch()
-				} catch (error) {
-					plugin.reportError(error)
-				}
-			}
-		}
-		registerCleanup(cleanup)
-		if (plugin.startedLate) plugin.requireReload()
+		})
 		configureStorage(jsonStorage)
 		await jsonStorage.get()
 		if (stopped) return
 		let actions: GifActions | undefined
-		patches.push(
+		cleanup(
 			getModules(
 				withProps<GifActions>('fetchTrendingGIFs', 'trackSelectGIF'),
 				value => {
@@ -66,12 +60,12 @@ export default plugin<{ jsonStorage: SettingsData }>({
 			const get: HttpRequest = http.get.bind(http)
 
 			setActive(true)
-			patches.push(
+			cleanup(
 				getModules(
 					withProps('GIF_PROVIDER', 'getSearchPlaceholder'),
 					provider => {
 						if (stopped) return
-						patches.push(
+						cleanup(
 							after(
 								provider,
 								'getSearchPlaceholder',
@@ -89,7 +83,7 @@ export default plugin<{ jsonStorage: SettingsData }>({
 				),
 			)
 
-			patches.push(
+			cleanup(
 				onFluxEventDispatched('GIF_PICKER_QUERY', payload => {
 					if (payload.type === 'GIF_PICKER_QUERY') {
 						requests.get('results')?.abort()
@@ -98,7 +92,7 @@ export default plugin<{ jsonStorage: SettingsData }>({
 					return payload
 				}),
 			)
-			patches.push(
+			cleanup(
 				instead(http, 'get', function (args: unknown[], original) {
 					const [options] = args as [RequestOptions]
 					const match =
@@ -177,7 +171,7 @@ export default plugin<{ jsonStorage: SettingsData }>({
 				}),
 			)
 			for (const method of ['get', 'post'] as const)
-				patches.push(
+				cleanup(
 					instead(http, method, function (args: unknown[], original) {
 						const [options] = args as [RequestOptions]
 						const field = method === 'get' ? 'query' : 'body'
@@ -228,36 +222,38 @@ export default plugin<{ jsonStorage: SettingsData }>({
 							})
 					}),
 				)
-			patches.push(
-				patchPicker(
-					category => {
-						if (stopped || !actions) return
-						const query: string = viewStore.getQuery()
-						actions.resetSearch()
-						actions.fetchTrending()
-						actions.fetchTrendingSearchTerms()
-						if (category === 'Trending') actions.fetchTrendingGIFs(50)
-						else if (category !== 'Favorites' && query)
-							actions.search(query, 'Search', true, 100)
-					},
-					error => plugin.reportError(error),
-				),
+			patchPicker(
+				cleanup,
+				category => {
+					if (stopped || !actions) return
+					const query: string = viewStore.getQuery()
+					actions.resetSearch()
+					actions.fetchTrending()
+					actions.fetchTrendingSearchTerms()
+					if (category === 'Trending') actions.fetchTrendingGIFs(50)
+					else if (category !== 'Favorites' && query)
+						actions.search(query, 'Search', true, 100)
+				},
+				error => plugin.reportError(error),
 			)
-			patches.push(storage.subscribe(cancelRequests))
+			cleanup(storage.subscribe(cancelRequests))
 		}
-		patches.push(
+		cleanup(
 			getModules(
 				withProps<HttpModule>('HTTP', 'get', 'post', 'put', 'patch', 'del'),
 				module => {
 					if (stopped) return
-					patches.push(
+					cleanup(
 						getStore<GifViewStore>('GIFPickerViewStore', viewStore => {
 							if (stopped) return
 							try {
 								install(module.HTTP, viewStore)
 							} catch (error) {
-								cleanup()
 								plugin.reportError(error)
+								stopped = true
+								setActive(false)
+								cancelRequests()
+								void plugin.stop().catch(error => plugin.reportError(error))
 							}
 						}),
 					)

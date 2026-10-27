@@ -1,5 +1,6 @@
 import { onImportedPath, safeInstead } from '../modules'
 import { getSettings } from '../state'
+import type { PluginCleanupApi } from '@valenced/plugins/types'
 import type { DeclutterSettings } from '../../types'
 
 interface MessageContent {
@@ -33,13 +34,12 @@ export function hideMessageClutter(
 	return Object.keys(changes).length ? { ...content, ...changes } : content
 }
 
-export function patchMessageClutter(): () => void {
-	const unpatch: Array<() => void> = []
-	unpatch.push(
+export function patchMessageClutter(cleanup: PluginCleanupApi): void {
+	cleanup(
 		onImportedPath<{
 			default: (...args: unknown[]) => MessageContent | null
 		}>('modules/messages/native/renderer/createMessageContent.tsx', ns => {
-			unpatch.push(
+			cleanup(
 				safeInstead(ns, 'default', function (args, original) {
 					const content = Reflect.apply(original, this, args)
 					return content ? hideMessageClutter(content, getSettings()) : content
@@ -47,7 +47,4 @@ export function patchMessageClutter(): () => void {
 			)
 		}),
 	)
-	return () => {
-		for (const un of unpatch) un()
-	}
 }

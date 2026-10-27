@@ -18,6 +18,7 @@ import {
 	useGifProvidersSettings,
 	useProvidersEnabled,
 } from './storage'
+import type { PluginCleanupApi } from '@valenced/plugins/types'
 import type { ReactElement } from 'react'
 import type {
 	GifItemProps,
@@ -157,23 +158,28 @@ function PickerControls({
 }
 
 export function patchPicker(
+	cleanup: PluginCleanupApi,
 	refresh: (category: string) => void,
 	report: (error: unknown) => void,
 ) {
 	refreshPicker = refresh
 	let stopped = false
-	const patches: (() => void)[] = []
+	cleanup(() => {
+		stopped = true
+		refreshPicker = undefined
+		ActionSheetActionCreators.hideActionSheet(SHEET_KEY)
+	})
 	const memoName = createFilterGenerator<[string]>(
 		([name], _, value) =>
 			value != null && typeof value === 'object' && value.type?.name === name,
 		([name]) => `palmdevs.tenor-gif-search.memo(${name})`,
 		FilterScopes.Initialized,
 	)
-	patches.push(
+	cleanup(
 		getModules(memoName('GIFPickerHeader'), target => {
 			if (stopped) return
 			try {
-				patches.push(
+				cleanup(
 					instead(target, 'type', function (args, original) {
 						const result = Reflect.apply(original, this, args)
 						return isValidElement(result) ? (
@@ -188,13 +194,13 @@ export function patchPicker(
 			}
 		}),
 	)
-	patches.push(
+	cleanup(
 		getModules(
 			withName('GIFPickerItemView'),
 			target => {
 				if (stopped) return
 				try {
-					patches.push(
+					cleanup(
 						instead(
 							target as { default: (props: GifItemProps) => React.ReactNode },
 							'default',
@@ -225,10 +231,4 @@ export function patchPicker(
 			{ returnNamespace: true },
 		),
 	)
-	return () => {
-		stopped = true
-		refreshPicker = undefined
-		ActionSheetActionCreators.hideActionSheet(SHEET_KEY)
-		patches.reverse().forEach(unpatch => unpatch())
-	}
 }

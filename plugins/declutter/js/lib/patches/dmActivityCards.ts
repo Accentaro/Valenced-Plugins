@@ -1,5 +1,6 @@
 import { onImportedPath, safeInstead } from '../modules'
 import { getSettings } from '../state'
+import type { PluginCleanupApi } from '@valenced/plugins/types'
 import type { ReactNode } from 'react'
 
 interface ActivityCardsModule {
@@ -7,14 +8,12 @@ interface ActivityCardsModule {
 	getMessagesItemHappeningNowHeight: (...args: unknown[]) => number
 }
 
-export function patchDmActivityCards(): () => void {
-	const unpatch: Array<() => void> = []
-
-	unpatch.push(
+export function patchDmActivityCards(cleanup: PluginCleanupApi): void {
+	cleanup(
 		onImportedPath(
 			'modules/main_tabs_v2/native/tabs/messages/items/MessagesItemHappeningNow.tsx',
 			(ns: ActivityCardsModule) => {
-				unpatch.push(
+				cleanup(
 					safeInstead(
 						ns.default,
 						'type',
@@ -35,8 +34,4 @@ export function patchDmActivityCards(): () => void {
 			},
 		),
 	)
-
-	return () => {
-		for (const un of unpatch) un?.()
-	}
 }

@@ -12,26 +12,21 @@ import { patchServerTags } from './serverTags'
 import { patchServerThemes } from './serverThemes'
 import { patchWishlist } from './wishlist'
 import { patchYouDock } from './youDock'
+import type { PluginCleanupApi } from '@valenced/plugins/types'
 
-export function patchAll(): () => void {
-	const unpatch: Array<() => void> = []
-
-	unpatch.push(patchAvatarDecorations())
-	unpatch.push(patchMessageClutter())
-	unpatch.push(patchNameplates())
-	unpatch.push(patchProfileEffects())
-	unpatch.push(patchProfileFrames())
-	unpatch.push(patchServerTags())
-	unpatch.push(patchBadges())
-	unpatch.push(patchWishlist())
-	unpatch.push(patchYouDock())
-	unpatch.push(patchBoostGoal())
-	unpatch.push(patchChannelNameEmojis())
-	unpatch.push(patchDisplayNameStyles())
-	unpatch.push(patchDmActivityCards())
-	unpatch.push(patchServerThemes())
-
-	return () => {
-		for (const un of unpatch) un?.()
-	}
+export function patchAll(cleanup: PluginCleanupApi): void {
+	patchAvatarDecorations(cleanup)
+	patchMessageClutter(cleanup)
+	patchNameplates(cleanup)
+	patchProfileEffects(cleanup)
+	patchProfileFrames(cleanup)
+	patchServerTags(cleanup)
+	patchBadges(cleanup)
+	patchWishlist(cleanup)
+	patchYouDock(cleanup)
+	patchBoostGoal(cleanup)
+	patchChannelNameEmojis(cleanup)
+	patchDisplayNameStyles(cleanup)
+	patchDmActivityCards(cleanup)
+	patchServerThemes(cleanup)
 }

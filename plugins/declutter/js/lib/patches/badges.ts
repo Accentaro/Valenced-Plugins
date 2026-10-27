@@ -1,14 +1,13 @@
 import { getDefaultNameFilter, onModule, safeInstead } from '../modules'
 import { getSettings } from '../state'
+import type { PluginCleanupApi } from '@valenced/plugins/types'
 
-export function patchBadges(): () => void {
-	const unpatch: Array<() => void> = []
-
+export function patchBadges(cleanup: PluginCleanupApi): void {
 	const enabled = () => getSettings().badges
 
-	unpatch.push(
+	cleanup(
 		onModule(getDefaultNameFilter('useBadges'), ns => {
-			unpatch.push(
+			cleanup(
 				safeInstead(ns, 'default', (args, original) => {
 					const badges = original(...args)
 					return enabled() ? [] : badges
@@ -16,8 +15,4 @@ export function patchBadges(): () => void {
 			)
 		}),
 	)
-
-	return () => {
-		for (const un of unpatch) un?.()
-	}
 }

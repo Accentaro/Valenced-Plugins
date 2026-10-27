@@ -32,7 +32,11 @@ let ui: ReturnType<typeof createChatUi> | undefined
 export default plugin<{ jsonStorage: Settings }>({
 	jsonStorage: { load: true, default: defaults },
 	SettingsComponent,
-	preInit({ cleanup }) {
+	preInit({ cleanup, plugin }) {
+		if (plugin.startedLate) {
+			plugin.requireReload()
+			return
+		}
 		// Subscribe before Discord captures the native Chat export in its imports.
 		for (const name of ['StandaloneChannelScreen', 'ChatInput'] as const) {
 			cleanup(
@@ -57,9 +61,12 @@ export default plugin<{ jsonStorage: Settings }>({
 		})
 	},
 	start(api) {
+		if (api.plugin.startedLate) {
+			api.plugin.requireReload()
+			return
+		}
 		ui = createChatUi(api)
 		registerYouBar(api, registerGuildbar(api))
-		if (api.plugin.startedLate) api.plugin.requireReload()
 	},
 	stop({ plugin }) {
 		plugin.requireReload()

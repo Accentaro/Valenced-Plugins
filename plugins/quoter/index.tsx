@@ -23,13 +23,16 @@ export default plugin<{ jsonStorage: QuoterSettings }>({
 	SettingsComponent: Settings,
 	async start(api) {
 		const { cleanup, jsonStorage, plugin } = api
+		if (plugin.startedLate) {
+			plugin.requireReload()
+			return
+		}
 		let stopped = false
 		cleanup(() => {
 			stopped = true
 			setActive(false)
 			closeQuoteModal()
 		})
-		if (plugin.startedLate) plugin.requireReload()
 		configureStorage(jsonStorage)
 		await loadSettings()
 		if (stopped) return

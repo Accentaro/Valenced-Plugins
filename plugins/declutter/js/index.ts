@@ -3,7 +3,7 @@ import { registerSettingsEditor } from './customization/SettingsEditor'
 import { DEFAULTS } from './defaults'
 import { initModules } from './lib/modules'
 import { patchAll } from './lib/patches'
-import { getSettings, setStorage } from './lib/state'
+import { setStorage } from './lib/state'
 import Settings from './settings'
 import type { DeclutterSettings } from './types'
 
@@ -17,22 +17,19 @@ export default plugin<{ jsonStorage: DeclutterSettings }>({
 	},
 	start(api) {
 		const { cleanup, jsonStorage, plugin } = api
+		if (plugin.startedLate) {
+			plugin.requireReload()
+			return
+		}
 		registerMessageSheet(api)
 		registerSettingsEditor(api)
 		initModules(error => plugin.reportError(error))
 		setStorage(jsonStorage, plugin.api.unscoped)
 
 		try {
-			cleanup(patchAll())
+			patchAll(cleanup)
 		} catch (error) {
 			plugin.reportError(error)
-		}
-
-		// Avatar decorations are parsed once and cached on records, so an enabled state only
-		// fully applies after a reload. When the plugin is enabled while the app is running,
-		// cached records still hold the pre-enable decorations
-		if (plugin.startedLate && getSettings().avatarDecorations) {
-			plugin.requireReload()
 		}
 	},
 	// The same caching that delays the enabled state also delays the disabled state: hidden

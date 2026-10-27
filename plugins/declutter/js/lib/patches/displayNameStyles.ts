@@ -1,17 +1,14 @@
 import { getDefaultNameFilter, onModule, safeInstead } from '../modules'
 import { getSettings } from '../state'
+import type { PluginCleanupApi } from '@valenced/plugins/types'
 
-export function patchDisplayNameStyles(): () => void {
-	const unpatch: Array<() => void> = []
-	let disposed = false
-
+export function patchDisplayNameStyles(cleanup: PluginCleanupApi): void {
 	for (const name of ['useDisplayNameStyles', 'createMessageContent'])
-		unpatch.push(
+		cleanup(
 			onModule(
 				getDefaultNameFilter(name),
 				(ns: { default: (...args: unknown[]) => unknown }) => {
-					if (disposed) return
-					unpatch.push(
+					cleanup(
 						safeInstead(
 							ns,
 							'default',
@@ -31,9 +28,4 @@ export function patchDisplayNameStyles(): () => void {
 				},
 			),
 		)
-
-	return () => {
-		disposed = true
-		for (const un of unpatch) un?.()
-	}
 }

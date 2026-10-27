@@ -1,6 +1,7 @@
 import React from 'react'
 import { onImportedPath, safeInstead } from '../modules'
 import { getSettings } from '../state'
+import type { PluginCleanupApi } from '@valenced/plugins/types'
 import type { ReactNode } from 'react'
 
 interface UnicodeEmojis {
@@ -60,10 +61,8 @@ function replaceName(
 			})
 }
 
-export function patchChannelNameEmojis(): () => void {
-	const unpatch: Array<() => void> = []
-
-	unpatch.push(
+export function patchChannelNameEmojis(cleanup: PluginCleanupApi): void {
+	cleanup(
 		onImportedPath<UnicodeEmojis>(
 			'modules/emojis/UnicodeEmojis.tsx',
 			emojis => {
@@ -84,15 +83,15 @@ export function patchChannelNameEmojis(): () => void {
 					'modules/chat_input/native/ChatInput.tsx',
 					'modules/channel_list_v2/native/items/TextChannel.tsx',
 				])
-					unpatch.push(
+					cleanup(
 						onImportedPath<{
 							default: { type: (...args: unknown[]) => ReactNode }
 						}>(path, ns => {
-							unpatch.push(safeInstead(ns.default, 'type', transform))
+							cleanup(safeInstead(ns.default, 'type', transform))
 						}),
 					)
 
-				unpatch.push(
+				cleanup(
 					onImportedPath<{
 						renderChannelTitle: (
 							name: string,
@@ -101,7 +100,7 @@ export function patchChannelNameEmojis(): () => void {
 					}>(
 						'modules/main_tabs_v2/native/channel/header/ChannelHeaderShared.tsx',
 						ns => {
-							unpatch.push(
+							cleanup(
 								safeInstead(
 									ns,
 									'renderChannelTitle',
@@ -125,6 +124,8 @@ export function patchChannelNameEmojis(): () => void {
 							)
 						},
 					),
+				)
+				cleanup(
 					onImportedPath<{
 						default: {
 							type: (props: { channel: { name: string } }) => ReactNode
@@ -132,7 +133,7 @@ export function patchChannelNameEmojis(): () => void {
 					}>(
 						'modules/main_tabs_v2/native/sidebar/details/header_v2/ChannelNameHeader.tsx',
 						ns => {
-							unpatch.push(
+							cleanup(
 								safeInstead(ns.default, 'type', function (args, original) {
 									const [props] = args
 									if (!getSettings().channelNameEmojis)
@@ -157,26 +158,25 @@ export function patchChannelNameEmojis(): () => void {
 							)
 						},
 					),
+				)
+				cleanup(
 					onImportedPath<{
 						BaseChannelName: (...args: unknown[]) => ReactNode
 					}>('modules/guild_sidebar/native/BaseChannelItem.tsx', ns => {
-						unpatch.push(safeInstead(ns, 'BaseChannelName', transform))
+						cleanup(safeInstead(ns, 'BaseChannelName', transform))
 					}),
-
+				)
+				cleanup(
 					onImportedPath<{
 						CategoryChannel: (...args: unknown[]) => ReactNode
 					}>(
 						'modules/channel_list_v2/native/items/RedesignCategory.tsx',
 						ns => {
-							unpatch.push(safeInstead(ns, 'CategoryChannel', transform))
+							cleanup(safeInstead(ns, 'CategoryChannel', transform))
 						},
 					),
 				)
 			},
 		),
 	)
-
-	return () => {
-		for (const un of unpatch) un?.()
-	}
 }

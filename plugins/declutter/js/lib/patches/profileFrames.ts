@@ -7,15 +7,14 @@ import {
 	safeInsteadJSX,
 } from '../modules'
 import { getSettings } from '../state'
+import type { PluginCleanupApi } from '@valenced/plugins/types'
 
-export function patchProfileFrames(): () => void {
-	const unpatch: Array<() => void> = []
-
+export function patchProfileFrames(cleanup: PluginCleanupApi): void {
 	const enabled = () => getSettings().profileFrames
 
-	unpatch.push(
+	cleanup(
 		onModule(getDefaultNameFilter('useProfileFrame'), ns => {
-			unpatch.push(
+			cleanup(
 				safeInstead(ns, 'default', (args, original) => {
 					const frame = original(...args)
 					return enabled() ? null : frame
@@ -24,11 +23,11 @@ export function patchProfileFrames(): () => void {
 		}),
 	)
 
-	unpatch.push(
+	cleanup(
 		onModule(getProfileFrameComponentFilter(), ns => {
 			const component = resolveComponent(ns)
 			if (!component) return
-			unpatch.push(
+			cleanup(
 				safeInsteadJSX(component, (args, jsx) => {
 					if (!enabled()) return jsx(...args)
 					return null
@@ -36,8 +35,4 @@ export function patchProfileFrames(): () => void {
 			)
 		}),
 	)
-
-	return () => {
-		for (const un of unpatch) un?.()
-	}
 }

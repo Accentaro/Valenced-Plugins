@@ -8,6 +8,7 @@ import {
 import { instead } from '@valenced/patcher'
 import { afterJSX, insteadJSX } from '@valenced/react/jsx-runtime'
 import type { Filter } from '@valenced/modules/finders/filters'
+import type { PluginCleanupApi } from '@valenced/plugins/types'
 import type { ElementType } from 'react'
 
 let reportError: (error: unknown) => void
@@ -103,13 +104,17 @@ export function onImportedPath<T = any>(
  * during teardown can no longer install a patch that nothing will ever remove.
  */
 export function onComponentPatch(
+	cleanup: PluginCleanupApi,
 	path: string,
 	hook: (args: any[], jsx: any) => any,
-): () => void {
-	const cleanups: Array<() => void> = []
+): void {
 	const seen = new Set<any>()
 	let disposed = false
 	let timer: ReturnType<typeof setTimeout> | undefined
+	cleanup(() => {
+		disposed = true
+		if (timer !== undefined) clearTimeout(timer)
+	})
 
 	function tryPatch(exports: any) {
 		if (disposed) return
@@ -117,7 +122,7 @@ export function onComponentPatch(
 		if (!component || seen.has(component)) return
 		seen.add(component)
 		if (disposed) return
-		cleanups.push(safeInsteadJSX(component, hook))
+		cleanup(safeInsteadJSX(component, hook))
 	}
 
 	function schedule(exports: any, attempt: number) {
@@ -136,13 +141,5 @@ export function onComponentPatch(
 		schedule(exports, 0)
 	}
 
-	const unsub = onImportedPath<any>(path, handle)
-
-	return () => {
-		disposed = true
-		if (timer !== undefined) clearTimeout(timer)
-		unsub?.()
-		// Iterate a snapshot: `handle` can append while cleanup runs.
-		for (const un of cleanups.splice(0)) un?.()
-	}
+	cleanup(onImportedPath<any>(path, handle))
 }
