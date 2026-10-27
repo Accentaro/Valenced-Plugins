@@ -1,5 +1,11 @@
 import { spawnSync } from 'node:child_process'
-import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import {
+	mkdirSync,
+	readdirSync,
+	readFileSync,
+	rmSync,
+	writeFileSync,
+} from 'node:fs'
 import { zipSync } from 'fflate'
 
 function run(args) {
@@ -13,6 +19,10 @@ function run(args) {
 run(['node_modules/typescript/bin/tsc', '--noEmit'])
 run(['node_modules/@valenced/plugin-cli/bin/valenced-plugin.js', 'build'])
 mkdirSync('build/dist', { recursive: true })
+// This directory contains generated ZIPs; discard stale IDs/versions on rebuild.
+for (const file of readdirSync('build/dist')) {
+	if (file.endsWith('.zip')) rmSync(`build/dist/${file}`)
+}
 for (const folder of readdirSync('plugins', { withFileTypes: true })) {
 	if (!folder.isDirectory()) continue
 	const base = `plugins/${folder.name}/`

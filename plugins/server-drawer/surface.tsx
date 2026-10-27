@@ -1,4 +1,3 @@
-/** @jsxImportSource . */
 import { getAssetIdByName } from '@valenced/assets'
 import SearchInput from '@valenced/components/SearchInput'
 import { Design } from '@valenced/discord/design'
@@ -1090,7 +1089,7 @@ export function createServerDrawer(
 							</View>
 						))
 					) : uri ? (
-						<Fragment>
+						<>
 							<Image
 								accessibilityIgnoresInvertColors
 								resizeMode="cover"
@@ -1112,7 +1111,7 @@ export function createServerDrawer(
 									}}
 								/>
 							)}
-						</Fragment>
+						</>
 					) : (
 						<Text
 							numberOfLines={1}
@@ -1227,7 +1226,7 @@ export function createServerDrawer(
 			const list = layout === 'list'
 			const highlighted = selected || merging
 			const content = (
-				<Fragment>
+				<>
 					{list || previewWidth ? (
 						artwork
 					) : (
@@ -1260,7 +1259,7 @@ export function createServerDrawer(
 					{!previewWidth && list && folder ? (
 						<Icon name="ChevronSmallRightIcon" color={muted} size={22} />
 					) : null}
-				</Fragment>
+				</>
 			)
 
 			if (previewWidth)
@@ -2647,7 +2646,7 @@ export function createServerDrawer(
 											<View style={{ height: drawerHeight - 16 }}>
 												<View style={styles.header}>
 													{drawerFolder ? (
-														<Fragment>
+														<>
 															<Icon
 																label="Back to all servers"
 																onPress={() => changeFolder()}
@@ -2660,7 +2659,7 @@ export function createServerDrawer(
 																folder={drawerFolder}
 																style={{ flex: 1, paddingVertical: 8 }}
 															/>
-														</Fragment>
+														</>
 													) : (
 														<Tabs
 															options={VIEW_OPTIONS}

@@ -1,129 +1,130 @@
-import { FileModule as NativeFileModule } from '@valenced/discord/native'
+import { FileModule } from '@valenced/discord/native'
 import { lookupModule } from '@valenced/modules/finders'
 import { withProps } from '@valenced/modules/finders/filters'
+import type { PluginApi } from '@valenced/plugins/types'
 import type { RenderedQuote } from '../types'
 
-interface ParsedDataUrl {
-	body: string
-	isBase64: boolean
-	mime: string
+type NativeUploadItem = {
+	platform: number
+	uri: string
+	filename: string
+	mimeType: string
+}
+interface CloudUpload {
+	item: NativeUploadItem
+}
+interface MessageActions {
+	sendMessage(
+		channelId: string,
+		message: {
+			content: string
+			invalidEmojis: unknown[]
+			validNonShortcutEmojis: unknown[]
+			tts: boolean
+		},
+		clearDraft: boolean,
+		options: {
+			attachmentsToUpload: CloudUpload[]
+			onAttachmentUploadError(
+				file: unknown,
+				code: unknown,
+				reason: unknown,
+			): void
+		},
+	): Promise<{ ok: boolean; status?: number } | undefined>
+	receiveMessage: unknown
 }
 
-function parseDataUrl(dataUrl: string): ParsedDataUrl | null {
-	if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:')) return null
-	const commaIndex = dataUrl.indexOf(',')
-	if (commaIndex < 0) return null
-
-	const meta = dataUrl.slice(5, commaIndex)
-	const body = dataUrl.slice(commaIndex + 1)
-	const isBase64 = meta.includes(';base64')
-	const mime = (meta.split(';')[0] || 'image/png').trim() || 'image/png'
-
-	return { body, isBase64, mime }
-}
-
-function getApiBase(): string {
-	try {
-		let base = lookupModule(
-			withProps<{ getAPIBaseURL(): string; del: unknown }>(
-				'getAPIBaseURL',
-				'del',
-			),
-		)[0]?.getAPIBaseURL?.()
-		if (typeof base === 'string') {
-			if (base.startsWith('//')) base = `https:${base}`
-			// Only trust values that already include the API path segment —
-			// a bare origin would send the message POST to the wrong route.
-			if (base.startsWith('http') && base.includes('/api/')) return base
-		}
-	} catch {}
-	return 'https://discord.com/api/v9'
-}
-
-/** Writes PNG/GIF output to app cache and uploads it directly to Discord. */
+/** Use Discord's upload queue, message validation and retry handling. */
 export async function sendQuoteAttachment(
 	channelId: string,
 	image: RenderedQuote,
 	filename: string,
+	logger: PluginApi['logger'],
 ): Promise<void> {
-	const parsed = parseDataUrl(image.dataUrl)
-	if (
-		!parsed?.isBase64 ||
-		!parsed.body ||
-		!['image/png', 'image/gif'].includes(parsed.mime)
-	) {
-		throw new Error('Invalid rendered quote image.')
-	}
-
-	const extension = parsed.mime === 'image/gif' ? 'gif' : 'png'
-	filename = filename.replace(/\.(png|gif)$/i, `.${extension}`)
-	const tempPath = `revenge-next/quoter/${Date.now()}-${Math.random().toString(16).slice(2)}.${extension}`
-	const filePath = await NativeFileModule.writeFile(
-		'cache',
-		tempPath,
-		parsed.body,
-		'base64',
-	)
-	const uri = String(filePath).startsWith('file://')
-		? String(filePath)
-		: `file://${filePath}`
-
-	try {
-		const token = lookupModule(
-			withProps<{ getToken(): string }>('getToken'),
-		)[0]?.getToken?.()
-		if (!token) throw new Error('Unable to resolve authorization token.')
-
-		const form = new FormData()
-		form.append(
-			'payload_json',
-			JSON.stringify({
-				content: '',
-				channel_id: channelId,
-				type: 0,
-				sticker_ids: [],
-				attachments: [{ id: '0', filename }],
-				nonce: Date.now().toString(),
-			}),
+	const match =
+		/^data:(image\/(?:png|gif));base64,([A-Za-z0-9+/]+={0,2})$/.exec(
+			image.dataUrl,
 		)
-		form.append('files[0]', {
-			uri,
-			type: parsed.mime,
-			name: filename,
-		} as unknown as Blob)
+	if (!match || match[2].length % 4 !== 0)
+		throw new Error('Invalid rendered quote image.')
+	const [, mimeType, body] = match
+	const [messages] = lookupModule(
+		withProps<MessageActions>('sendMessage', 'receiveMessage'),
+	)
+	const [uploads] = lookupModule(
+		withProps<{
+			CloudUpload: new (
+				item: NativeUploadItem,
+				channelId: string,
+				index: number,
+				allowOptimization: boolean,
+			) => CloudUpload
+		}>('CloudUpload'),
+	)
+	const [platform] = lookupModule(
+		withProps<{ UploadPlatform: { REACT_NATIVE: number } }>('UploadPlatform'),
+	)
+	if (!messages || !uploads || !platform)
+		throw new Error('Native attachment uploads are unavailable.')
 
-		// Generous cap for a multipart image upload on slow mobile networks;
-		// without it a stalled send would never surface a toast.
-		const controller = new AbortController()
-		const timer = setTimeout(() => controller.abort(), 60_000)
-
-		let response: Response
-		try {
-			response = await fetch(`${getApiBase()}/channels/${channelId}/messages`, {
-				method: 'POST',
-				headers: { Authorization: token },
-				body: form,
-				signal: controller.signal,
-			})
-		} catch (error) {
-			const aborted =
-				(error instanceof Error ? error.name : undefined) === 'AbortError'
-			throw aborted ? new Error('Upload timed out.') : error
-		} finally {
-			clearTimeout(timer)
-		}
-
-		if (!response.ok) {
-			const text = await response.text().catch(() => '')
-			console.error('[Quoter] REST upload failed:', response.status, text)
-			throw new Error(`Discord API returned ${response.status}`)
-		}
+	const extension = mimeType === 'image/gif' ? 'gif' : 'png'
+	filename = filename.replace(/\.(png|gif)$/i, `.${extension}`)
+	const tempPath = `dev.benjii.quoter/${Date.now()}-${Math.random().toString(16).slice(2)}.${extension}`
+	const filePath = String(
+		await FileModule.writeFile('cache', tempPath, body, 'base64'),
+	)
+	const uri = filePath.startsWith('file://') ? filePath : `file://${filePath}`
+	let handedToDiscord = false
+	let sent = false
+	try {
+		// CloudUpload(item, channelId, index, allowOptimization) is the constructor
+		// used by UploadAttachmentStore. Preserve generated PNG/GIF bytes.
+		const upload = new uploads.CloudUpload(
+			{
+				platform: platform.UploadPlatform.REACT_NATIVE,
+				uri,
+				filename,
+				mimeType,
+			},
+			channelId,
+			0,
+			false,
+		)
+		let uploadError: Error | undefined
+		handedToDiscord = true
+		const result = await messages.sendMessage(
+			channelId,
+			{
+				content: '',
+				invalidEmojis: [],
+				validNonShortcutEmojis: [],
+				tts: false,
+			},
+			false,
+			{
+				attachmentsToUpload: [upload],
+				onAttachmentUploadError(_file, code, reason) {
+					logger.warn('Native quote upload failed', code, reason)
+					uploadError = new Error('Could not upload the quote attachment.')
+				},
+			},
+		)
+		if (uploadError) throw uploadError
+		if (!result?.ok)
+			throw new Error(
+				'Discord could not send the quote. Check the failed message before retrying.',
+			)
+		sent = true
 	} finally {
-		// Upload has settled; a cleanup failure must not make a delivered quote look unsent.
-		try {
-			await NativeFileModule.removeFile('cache', tempPath)
-		} catch (error) {
-			console.warn('[Quoter] Could not remove cached quote', error)
+		// Discord may retain failed uploads for retry. Keep their cache files until
+		// the host clears its cache; deleting here would break the native retry UI.
+		if (sent || !handedToDiscord) {
+			try {
+				await FileModule.removeFile('cache', tempPath)
+			} catch (error) {
+				logger.warn('Could not remove cached quote', error)
+			}
 		}
 	}
 }

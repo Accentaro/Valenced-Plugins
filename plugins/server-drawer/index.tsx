@@ -1,4 +1,3 @@
-/** @jsxImportSource . */
 import { ToastActionCreators } from '@valenced/discord/actions'
 import {
 	getModuleWithImportedPath,
@@ -42,7 +41,7 @@ export default plugin<{ jsonStorage: t.ServerDrawerPreferences }>({
 			return
 		}
 		reportError = error => plugin.reportError(error)
-		cleanup(patchFocusMenu())
+		patchFocusMenu(cleanup)
 		const abort = new AbortController()
 		cleanup(() => abort.abort())
 		cleanup(
@@ -155,9 +154,7 @@ export default plugin<{ jsonStorage: t.ServerDrawerPreferences }>({
 					if (failed || abort.signal.aborted) return element
 					if (!isNativePanel(element)) {
 						failed = true
-						plugin.reportError(
-							new Error('Server Drawer: unsupported left-panel content.'),
-						)
+						plugin.reportError('Unsupported left-panel content.')
 						return element
 					}
 					if (Panel) return <Panel key={element.key} element={element} />

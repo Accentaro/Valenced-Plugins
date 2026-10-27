@@ -12,6 +12,8 @@ node node_modules/@valenced/plugin-cli/bin/valenced-plugin.js generate-index \
     --base-url "${base}/pool" \
     --out "$POOL_CHECKOUT/index.json"
 
+node scripts/prune-retired-plugins.mjs "$POOL_CHECKOUT/index.json"
+
 # Stage the pool too, so a manually deleted artifact also gets deleted with the updated index.
 git -C "$POOL_CHECKOUT" add pool index.json
 commit_pool \

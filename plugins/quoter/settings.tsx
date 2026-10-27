@@ -1,4 +1,3 @@
-/** @jsxImportSource . */
 import { getAssetIdByName as findAssetId } from '@valenced/assets'
 import { Design } from '@valenced/discord/design'
 import { useEffect } from 'react'

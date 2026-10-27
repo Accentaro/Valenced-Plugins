@@ -1,4 +1,3 @@
-/** @jsxImportSource . */
 import { ActionSheetActionCreators } from '@valenced/discord/actions'
 import { getModules } from '@valenced/modules/finders'
 import { withName } from '@valenced/modules/finders/filters'
@@ -22,7 +21,8 @@ import type { QuoteMessage, QuoterSettings, TreeProps } from './types'
 export default plugin<{ jsonStorage: QuoterSettings }>({
 	jsonStorage: { default: defaults },
 	SettingsComponent: Settings,
-	async start({ cleanup, jsonStorage, plugin }) {
+	async start(api) {
+		const { cleanup, jsonStorage, plugin } = api
 		let stopped = false
 		cleanup(() => {
 			stopped = true
@@ -38,7 +38,6 @@ export default plugin<{ jsonStorage: QuoterSettings }>({
 			getModules(
 				withName('LongPressMessageActionSheet'),
 				module => {
-					if (stopped) return
 					const target = module as {
 						default: (props: { message?: QuoteMessage }) => ReactNode
 					}
@@ -98,7 +97,7 @@ export default plugin<{ jsonStorage: QuoterSettings }>({
 												icon={icon}
 												onPress={() => {
 													ActionSheetActionCreators.hideAllActionSheets()
-													openQuoteModal(message)
+													openQuoteModal(message, api)
 												}}
 											/>,
 										)

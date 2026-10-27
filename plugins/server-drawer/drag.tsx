@@ -1,4 +1,3 @@
-/** @jsxImportSource . */
 import { lookupModule } from '@valenced/modules/finders'
 import { withProps } from '@valenced/modules/finders/filters'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'

@@ -56,7 +56,7 @@ export default function SettingsComponent({
 					value={settings.collapsibleGuildbar}
 					onValueChange={collapsibleGuildbar => {
 						if (collapsibleGuildbar && isServerDrawerActive()) {
-							const key = 'dev.benjii.collapsibleUI.guildbar-conflict'
+							const key = 'dev.benjii.collapsible-ui.guildbar-conflict'
 							AlertActionCreators.openAlert(
 								key,
 								<Design.AlertModal

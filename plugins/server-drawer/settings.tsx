@@ -1,4 +1,3 @@
-/** @jsxImportSource . */
 import Page from '@valenced/components/Page'
 import { Design } from '@valenced/discord/design'
 import { ScrollView } from 'react-native'

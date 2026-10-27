@@ -1,11 +1,11 @@
 {
 	"format": 1,
-	"id": "dev.benjii.serverdrawer",
+	"id": "dev.benjii.server-drawer",
 	"name": "Server Drawer",
 	"description": "A compact server dock with a searchable server and DM drawer, folders, and drag and drop.",
-	"author": "kmmiio99o, Rosie and Benjii <879393496627306587> <1356936317501571214> <463702169443368970>",
+	"author": "kmmiio99o <879393496627306587>",
 	"icon": "ServersIcon",
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"dependencies": {
 		"valenced.api": {
 			"version": ">=1 <2"
@@ -16,5 +16,6 @@
 	},
 	"dist": {
 		"script": "index.js"
-	}
+	},
+	"contributors": ["Rosie <1356936317501571214>", "Benjii <463702169443368970>"]
 }

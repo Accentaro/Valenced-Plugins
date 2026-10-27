@@ -1,4 +1,3 @@
-/** @jsxImportSource . */
 import {
 	AlertActionCreators,
 	ToastActionCreators,
@@ -15,7 +14,7 @@ import {
 	ReactModuleId,
 	ReactNativeModuleId,
 } from '@valenced/react'
-import { Fragment, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
 	ActivityIndicator,
 	Image,
@@ -32,22 +31,33 @@ import {
 import { buildRendererHtml } from './lib/renderer'
 import { sendQuoteAttachment } from './lib/send'
 import { useQuoterEnabled, useQuoterSettings } from './storage'
+import type { PluginApi } from '@valenced/plugins/types'
 import type { ComponentType } from 'react'
 import type {
 	QuoteMessage,
+	QuoterSettings,
 	RenderedQuote,
 	WebViewModule,
 	WebViewProps,
 } from './types'
 
-const KEY = 'revenge-next.quoter.preview'
+const KEY = 'dev.benjii.quoter.preview'
 export function closeQuoteModal() {
 	AlertActionCreators.dismissAlert(KEY)
 }
-export function openQuoteModal(message: QuoteMessage) {
-	AlertActionCreators.openAlert(KEY, <QuoteAlert message={message} />)
+export function openQuoteModal(
+	message: QuoteMessage,
+	api: PluginApi<{ jsonStorage: QuoterSettings }>,
+) {
+	AlertActionCreators.openAlert(KEY, <QuoteAlert message={message} api={api} />)
 }
-function QuoteAlert({ message }: { message: QuoteMessage }) {
+function QuoteAlert({
+	message,
+	api,
+}: {
+	message: QuoteMessage
+	api: PluginApi<{ jsonStorage: QuoterSettings }>
+}) {
 	const { height } = useWindowDimensions()
 	const settings = useQuoterSettings()
 	const enabled = useQuoterEnabled()
@@ -123,9 +133,15 @@ function QuoteAlert({ message }: { message: QuoteMessage }) {
 		}
 		closeQuoteModal()
 		try {
-			await sendQuoteAttachment(channelId, image, buildFileName(message))
+			await sendQuoteAttachment(
+				channelId,
+				image,
+				buildFileName(message),
+				api.logger,
+			)
 			ToastActionCreators.open('QUOTER_SENT', { text: 'Quote sent.' })
 		} catch (error) {
+			api.plugin.reportError(error)
 			ToastActionCreators.open('QUOTER_FAILED', {
 				text: `Failed to send quote: ${error instanceof Error ? error.message : String(error)}`,
 				variant: 'critical',
@@ -276,7 +292,7 @@ function QuoteAlert({ message }: { message: QuoteMessage }) {
 				</ScrollView>
 			}
 			actions={
-				<Fragment>
+				<>
 					<Design.AlertActionButton
 						text="Send"
 						variant="primary"
@@ -288,7 +304,7 @@ function QuoteAlert({ message }: { message: QuoteMessage }) {
 						variant="secondary"
 						onPress={closeQuoteModal}
 					/>
-				</Fragment>
+				</>
 			}
 		/>
 	)
