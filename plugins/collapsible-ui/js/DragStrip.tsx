@@ -1,12 +1,8 @@
-import { Tokens } from '@valenced/discord/common/tokens'
-import { Design } from '@valenced/discord/design'
 import { View } from 'react-native'
+import type { StyleProp, ViewStyle } from 'react-native'
 import type { GestureLibrary } from './PullHandle'
 
 export const DRAG_STRIP_HEIGHT = 16
-
-// Plugin modules are evaluated before Discord's design API is available.
-let useStyles: ReturnType<typeof Design.createStyles> | undefined
 
 // A 4dp visible grip inside a compact touch target, shared by every surface.
 export function DragStrip({
@@ -15,17 +11,15 @@ export function DragStrip({
 	hidden,
 	label,
 	onToggle,
+	style,
 }: {
 	library: GestureLibrary
 	gesture: unknown
 	hidden: boolean
 	label: string
 	onToggle(): void
+	style?: StyleProp<ViewStyle>
 }) {
-	useStyles ??= Design.createStyles({
-		strip: { backgroundColor: Tokens.default.colors.TEXT_MUTED },
-	})
-	const styles = useStyles()
 	return (
 		<library.GestureDetector gesture={gesture}>
 			<View
@@ -39,16 +33,24 @@ export function DragStrip({
 				onAccessibilityTap={onToggle}
 				onAccessibilityAction={onToggle}
 				hitSlop={{ left: 8, right: 8 }}
-				style={{
-					height: DRAG_STRIP_HEIGHT,
-					width: 72,
-					alignSelf: 'center',
-					alignItems: 'center',
-					justifyContent: 'center',
-				}}
+				style={[
+					{
+						height: DRAG_STRIP_HEIGHT,
+						width: 72,
+						alignSelf: 'center',
+						alignItems: 'center',
+						justifyContent: 'center',
+					},
+					style,
+				]}
 			>
 				<View
-					style={[styles.strip, { width: 32, height: 4, borderRadius: 2 }]}
+					style={{
+						backgroundColor: '#fff',
+						width: 32,
+						height: 4,
+						borderRadius: 2,
+					}}
 				/>
 			</View>
 		</library.GestureDetector>

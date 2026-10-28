@@ -1,47 +1,24 @@
-import { Tokens } from '@valenced/discord/common/tokens'
-import { Design } from '@valenced/discord/design'
-import { getModules, lookupModule } from '@valenced/modules/finders'
+import { lookupModule } from '@valenced/modules/finders'
 import { withProps } from '@valenced/modules/finders/filters'
-import { after } from '@valenced/patcher'
 import { findInTree } from '@valenced/utils/tree'
 import {
 	cloneElement,
-	createContext,
 	isValidElement,
 	useCallback,
-	useContext,
 	useEffect,
 	useMemo,
 	useState,
 	useSyncExternalStore,
 } from 'react'
-import { Animated, Keyboard, View } from 'react-native'
+import { Animated, Keyboard, StyleSheet, View } from 'react-native'
 import { useCollapsibleBar } from './collapse'
-import { DragStrip } from './DragStrip'
+import { DRAG_STRIP_HEIGHT, DragStrip } from './DragStrip'
 import { usePullHandle } from './PullHandle'
 import { defaults } from './Settings'
 import type { PluginApi } from '@valenced/plugins/types'
-import type { ComponentProps, ReactElement, ReactNode, RefObject } from 'react'
+import type { ReactElement, ReactNode, RefObject } from 'react'
 import type { StyleProp, ViewStyle } from 'react-native'
 import type { Settings } from './Settings'
-
-let useHandleStyles: ReturnType<typeof Design.createStyles> | undefined
-
-function useChatSurfaceStyles() {
-	useHandleStyles ??= Design.createStyles({
-		surface: { backgroundColor: Tokens.default.colors.BACKGROUND_BASE_LOWER },
-	})
-	return useHandleStyles()
-}
-
-function ChatDragStrip(props: ComponentProps<typeof DragStrip>) {
-	const styles = useChatSurfaceStyles()
-	return (
-		<View style={styles.surface}>
-			<DragStrip {...props} />
-		</View>
-	)
-}
 
 export interface HostProps {
 	ref?: RefObject<{ dismissKeyboard(): void } | null>
@@ -61,6 +38,7 @@ export function createChatUi({
 	cleanup,
 }: PluginApi<{ jsonStorage: Settings }>) {
 	const AnimatedView = Animated.View
+
 	let running = true
 	const listeners = new Set<() => void>()
 	const subscribe = (listener: () => void) => {
@@ -81,27 +59,6 @@ export function createChatUi({
 			collapsibleInput: active && settings.collapsibleInput,
 		}
 	}
-	const CollapsibleInputContext = createContext(false)
-	function GuardContainer({ tree }: { tree: HostTree }) {
-		const collapsible = useContext(CollapsibleInputContext)
-		return collapsible
-			? cloneElement(tree, { style: [tree.props.style, { marginTop: 0 }] })
-			: tree
-	}
-	cleanup(
-		getModules(
-			withProps<{
-				ChatInputGuardContainer(props: HostProps): HostTree
-			}>('ChatInputGuardContainer'),
-			namespace => {
-				cleanup(
-					after(namespace, 'ChatInputGuardContainer', tree => (
-						<GuardContainer tree={tree} />
-					)),
-				)
-			},
-		),
-	)
 
 	function ChannelPage({ tree }: { tree: HostTree }) {
 		const { collapsibleHeader } = useSettings()
@@ -237,11 +194,12 @@ export function createChatUi({
 	}
 	function HeaderHandle({ bar }: { bar: HeaderBar }) {
 		return (
-			<ChatDragStrip
+			<DragStrip
 				library={bar.library}
 				gesture={bar.pull}
 				hidden={bar.hidden}
 				label="channel header"
+				style={{ position: 'absolute', bottom: 0, zIndex: 1 }}
 				onToggle={() => bar.settle(!bar.hidden, 0)}
 			/>
 		)
@@ -256,21 +214,51 @@ export function createChatUi({
 		const bar = useHeaderBar(inset)
 		if (!bar) return children
 		return (
-			<View collapsable={false} pointerEvents="box-none" style={{ zIndex: 1 }}>
+			<View
+				collapsable={false}
+				pointerEvents="box-none"
+				style={{
+					zIndex: 1,
+					paddingBottom: DRAG_STRIP_HEIGHT,
+					marginBottom: -DRAG_STRIP_HEIGHT,
+				}}
+			>
 				<HeaderBody bar={bar}>{children}</HeaderBody>
 				<HeaderHandle bar={bar} />
 			</View>
 		)
 	}
-	function Composer({
-		children: tree,
-		inputRef,
-	}: {
+	type FloatingInput = {
+		useChatInputFloatingOverlayStyle(): StyleProp<ViewStyle>
+	}
+	function Composer(props: {
 		children: HostTree
 		inputRef?: HostProps['ref']
 	}) {
+		const [floatingInput] = lookupModule(
+			withProps<FloatingInput>('useChatInputFloatingOverlayStyle'),
+		)
+		return floatingInput ? (
+			<ComposerBody {...props} floatingInput={floatingInput} />
+		) : (
+			props.children
+		)
+	}
+	function ComposerBody({
+		children: tree,
+		inputRef,
+		floatingInput,
+	}: {
+		children: HostTree
+		floatingInput: FloatingInput
+		inputRef?: HostProps['ref']
+	}) {
 		const { collapsibleInput } = useSettings()
-		const styles = useChatSurfaceStyles()
+		const inputStyle = StyleSheet.flatten(
+			floatingInput.useChatInputFloatingOverlayStyle(),
+		)
+		const inputOffset =
+			typeof inputStyle?.marginTop === 'number' ? inputStyle.marginTop : 0
 		const onCollapse = useCallback(() => {
 			inputRef?.current?.dismissKeyboard()
 			Keyboard.dismiss()
@@ -355,7 +343,6 @@ export function createChatUi({
 			tree,
 			{},
 			cloneElement(child, {
-				style: [child.props.style, { marginTop: 0 }],
 				pointerEvents: hidden ? 'none' : 'auto',
 				accessibilityElementsHidden: hidden,
 				importantForAccessibility: hidden ? 'no-hide-descendants' : 'auto',
@@ -368,13 +355,25 @@ export function createChatUi({
 				extrapolate: 'clamp',
 			})
 		return library && gesture && pull.gesture ? (
-			<AnimatedView style={[styles.surface, { flex: 0 }]}>
-				<View collapsable={false} pointerEvents="box-none">
-					<ChatDragStrip
+			<AnimatedView style={{ flex: 0 }} pointerEvents="box-none">
+				<View
+					collapsable={false}
+					pointerEvents="box-none"
+					style={{
+						paddingTop: DRAG_STRIP_HEIGHT - (hidden ? 0 : inputOffset),
+						marginTop: -DRAG_STRIP_HEIGHT + (hidden ? 0 : inputOffset),
+					}}
+				>
+					<DragStrip
 						library={library}
 						gesture={pull.gesture}
 						hidden={hidden}
 						label="chat box"
+						style={{
+							position: 'absolute',
+							top: 0,
+							zIndex: 1,
+						}}
 						onToggle={() => settle(!hidden, 0)}
 					/>
 					<library.GestureDetector gesture={gesture}>
@@ -387,16 +386,14 @@ export function createChatUi({
 									outputRange: [height, 0, 0],
 								}),
 								opacity: interpolate([1, 0]),
-								overflow: 'hidden',
+								overflow: hidden ? 'hidden' : 'visible',
 							}}
 						>
 							<View
 								style={{ position: 'absolute', left: 0, right: 0, top: 0 }}
 								onLayout={event => setHeight(event.nativeEvent.layout.height)}
 							>
-								<CollapsibleInputContext.Provider value={true}>
-									{composer}
-								</CollapsibleInputContext.Provider>
+								{composer}
 							</View>
 						</AnimatedView>
 					</library.GestureDetector>
