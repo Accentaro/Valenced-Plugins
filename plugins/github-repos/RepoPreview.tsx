@@ -1,5 +1,6 @@
+import { Tokens } from '@valenced/discord/common/tokens'
 import { Design } from '@valenced/discord/design'
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { Animated, ScrollView, useWindowDimensions, View } from 'react-native'
 import type { Repository } from './data'
 
@@ -15,6 +16,16 @@ export default function RepoPreview({
 	onOpen(): void
 }) {
 	const { fontScale } = useWindowDimensions()
+	const useStyles = useMemo(
+		() =>
+			Design.createStyles({
+				surface: {
+					backgroundColor: Tokens.default.colors.BACKGROUND_BASE_LOWEST,
+				},
+			}),
+		[],
+	)
+	const styles = useStyles()
 	const progress = useRef(new Animated.Value(reduced ? 1 : 0)).current
 	useEffect(() => {
 		if (reduced) {
@@ -61,7 +72,12 @@ export default function RepoPreview({
 				],
 			}}
 		>
-			<Design.Card style={{ flexShrink: 1, padding: 0, overflow: 'hidden' }}>
+			<Design.Card
+				style={[
+					styles.surface,
+					{ flexShrink: 1, padding: 0, overflow: 'hidden' },
+				]}
+			>
 				<View
 					style={{
 						flexDirection: 'row',
