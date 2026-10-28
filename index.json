@@ -238,8 +238,8 @@
       "versions": {
         "1.0.0": {
           "url": "https://plugins.benjiisworld.com/pool/dev.benjii.github-repos@1.0.0.zip",
-          "sha256": "58c5bf08a2fcbdd686a0afa4acb47b027756cf3b3a6afb8d14b19e034d3ee03b",
-          "size": 20862,
+          "sha256": "ad5efeddab3fda62d00e77802a8eb2453b1cb8fe940912ac561c7a98a64801ed",
+          "size": 23611,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
