@@ -96,6 +96,7 @@ export function registerMessageSheet(api: Api) {
 	}
 	api.cleanup(
 		afterJSX(Design.ActionSheet, sheet => {
+			if (!api.jsonStorage.cache?.customizeMessageActions) return sheet
 			// Channel sheets render inside a connected component; message sheets retain their existing hook.
 			const header = sheet.props.header
 			return isValidElement(header) &&
@@ -138,6 +139,7 @@ export function registerMessageSheet(api: Api) {
 	})
 	api.cleanup(
 		before(ActionSheetActionCreators, 'openLazy', args => {
+			if (!api.jsonStorage.cache?.customizeMessageActions) return args
 			const [pending, key] = args
 			const channelSheet = key.startsWith('ChannelLongPress-')
 			if (key !== sheetKey && !channelSheet) return args
@@ -166,6 +168,7 @@ export function registerMessageSheet(api: Api) {
 									: undefined
 								if (
 									!active ||
+									!api.jsonStorage.cache?.customizeMessageActions ||
 									!channel ||
 									!isValidElement<ChannelContentProps>(tree) ||
 									typeof tree.type !== 'function'
@@ -187,7 +190,8 @@ export function registerMessageSheet(api: Api) {
 					}
 					api.cleanup(
 						after(owner, 'default', tree => {
-							if (!active) return tree
+							if (!active || !api.jsonStorage.cache?.customizeMessageActions)
+								return tree
 							// React children may be a single element, an array or nested wrappers.
 							const result = wrapSheet(tree)
 							if (result === tree && tree != null && !reportedLayout) {

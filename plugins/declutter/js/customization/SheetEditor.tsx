@@ -7,7 +7,7 @@ import {
 	useMemo,
 	useState,
 } from 'react'
-import { useWindowDimensions, View } from 'react-native'
+import { View } from 'react-native'
 import { DEFAULTS as defaults } from '../defaults'
 import { SectionEditor } from './SectionEditor'
 import {
@@ -218,7 +218,6 @@ function EditableSheet({
 	api: Api
 }) {
 	const editor = useSurfaceEditor(api, surface.id)
-	const { height } = useWindowDimensions()
 	const { preferences, editing, save } = editor
 	const groups = useMemo(() => readGroups(sheet, surface), [sheet, surface])
 	const headerId = surface.identifyHeader(sheet.props.header)
@@ -245,18 +244,6 @@ function EditableSheet({
 					/>
 				</View>
 			) : null}
-			{editing ? (
-				<View
-					pointerEvents="none"
-					accessibilityElementsHidden
-					importantForAccessibility="no-hide-descendants"
-					style={{ opacity: headerHidden ? 0.4 : 1 }}
-				>
-					{sheet.props.header}
-				</View>
-			) : headerHidden ? null : (
-				sheet.props.header
-			)}
 		</View>
 	)
 	const arranged = arrangeSections(
@@ -265,33 +252,42 @@ function EditableSheet({
 		(entry: Entry) => entry.id,
 	)
 	return cloneElement(sheet, {
-		header: editing ? undefined : header,
+		// Preserve the native header's measurement and sheet-specific props.
+		header: headerHidden ? undefined : sheet.props.header,
 		...(editing && {
 			scrollable: false,
-			handleDisabled: true,
-			startExpanded: true,
 		}),
 		children: editing ? (
 			<SectionEditor
+				inSheet
 				header={header}
 				groups={groups}
 				preferences={preferences}
 				onChange={save}
-				height={height * 0.55}
 			/>
 		) : (
-			arranged.flatMap(group => {
-				const children = group.entries
-					.filter(entry => !entry.id || !preferences.hidden.includes(entry.id))
-					.map(entry =>
-						isValidElement(entry.row)
-							? cloneElement(entry.row, { key: entry.key })
-							: entry.row,
-					)
-				return children.length
-					? [cloneElement(group.element, { key: group.key, children })]
-					: []
-			})
+			[
+				<EditorToolbar
+					key="declutter-toolbar"
+					api={api}
+					surfaceId={surface.id}
+					editor={editor}
+				/>,
+				...arranged.flatMap(group => {
+					const children = group.entries
+						.filter(
+							entry => !entry.id || !preferences.hidden.includes(entry.id),
+						)
+						.map(entry =>
+							isValidElement(entry.row)
+								? cloneElement(entry.row, { key: entry.key })
+								: entry.row,
+						)
+					return children.length
+						? [cloneElement(group.element, { key: group.key, children })]
+						: []
+				}),
+			]
 		),
 	})
 }

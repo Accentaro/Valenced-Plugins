@@ -2,6 +2,7 @@ import { getAssetIdByName } from '@valenced/assets'
 import { Tokens } from '@valenced/discord/common/tokens'
 import { Design } from '@valenced/discord/design'
 import { Stores } from '@valenced/discord/flux'
+import { BottomSheet } from '@valenced/externals/gorhom'
 import { lookupModule } from '@valenced/modules/finders'
 import { withProps } from '@valenced/modules/finders/filters'
 import { lookupGeneratedIconComponent } from '@valenced/utils/discord'
@@ -22,6 +23,7 @@ import {
 } from './sectionDrag'
 import { arrangeSections, moveToSection } from './surfacePreferences'
 import type { ComponentProps, ComponentType, ReactNode } from 'react'
+import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
 import type { DropTarget, SectionBounds } from './sectionDrag'
 import type { SurfacePreferences } from './surfacePreferences'
 import type { SurfaceRowProps } from './surfaces'
@@ -163,14 +165,14 @@ export function SectionEditor({
 	onChange,
 	header,
 	RowComponent = EditorRow,
-	height,
+	inSheet = false,
 }: {
 	groups: EditorSection[]
 	preferences: SurfacePreferences
 	onChange(next: SurfacePreferences): void
 	header?: ReactNode
 	RowComponent?: ComponentType<EditorRowProps>
-	height?: number
+	inSheet?: boolean
 }) {
 	const AnimatedView = Animated.View
 	const spring = useMemo(() => {
@@ -187,6 +189,9 @@ export function SectionEditor({
 		if (!motion) throw Error('Action sheet drag animation is unavailable')
 		return motion.SUBTLE_SPRING
 	}, [])
+	const EditorScrollView = inSheet
+		? BottomSheet.BottomSheetScrollView
+		: ScrollView
 	const sections = useMemo(
 		() =>
 			arrangeSections(groups, preferences, (entry: EditorEntry) => entry.id),
@@ -381,22 +386,22 @@ export function SectionEditor({
 		<View
 			ref={root}
 			collapsable={false}
-			style={height ? { height } : { flex: 1 }}
+			style={inSheet ? undefined : { flex: 1 }}
 			onLayout={event => {
 				viewport.current.height = event.nativeEvent.layout.height
 			}}
 		>
-			<ScrollView
+			<EditorScrollView
 				ref={scroll}
 				scrollEnabled={!drag}
 				nestedScrollEnabled
 				removeClippedSubviews={false}
 				scrollEventThrottle={16}
-				onScroll={event => {
+				onScroll={(event: NativeSyntheticEvent<NativeScrollEvent>) => {
 					scrollY.current = event.nativeEvent.contentOffset.y
 					update()
 				}}
-				onContentSizeChange={(_, content) => {
+				onContentSizeChange={(_: number, content: number) => {
 					contentHeight.current = content
 				}}
 			>
@@ -559,7 +564,7 @@ export function SectionEditor({
 				{!!preview.extraHeight && (
 					<View style={{ height: preview.extraHeight }} />
 				)}
-			</ScrollView>
+			</EditorScrollView>
 			{drag && (
 				<AnimatedView
 					pointerEvents="none"
