@@ -36,7 +36,7 @@
       "author": "Benjii <463702169443368970>",
       "icon": "SettingsIcon",
       "channels": {
-        "latest": "1.0.1"
+        "latest": "1.0.3"
       },
       "versions": {
         "1.0.0": {
@@ -56,6 +56,19 @@
           "url": "https://plugins.benjiisworld.com/pool/dev.benjii.collapsible-ui@1.0.1.zip",
           "sha256": "1507c9992bfd5d942e649f97e963304481c4f5fda44fe71ad772f76f408ee078",
           "size": 24445,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        },
+        "1.0.3": {
+          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.collapsible-ui@1.0.3.zip",
+          "sha256": "7e322f0922b41d0b5e93f08ed5026d5c458fcaccc8c14617a972622377b5c232",
+          "size": 24475,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
@@ -177,6 +190,30 @@
           "url": "https://plugins.benjiisworld.com/pool/dev.benjii.gif-to-chat-input@1.0.0.zip",
           "sha256": "8c5fdc5d95a2b1a23bbdac774e78226b26b795ba9e879e4270f2603411c33594",
           "size": 17609,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        }
+      }
+    },
+    "dev.benjii.github-repos": {
+      "name": "Github Repos",
+      "description": "Browse repositories, stars and contributions from profile GitHub connections.",
+      "author": "Benjii <463702169443368970>",
+      "icon": "GithubIcon",
+      "channels": {
+        "latest": "1.0.0"
+      },
+      "versions": {
+        "1.0.0": {
+          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.github-repos@1.0.0.zip",
+          "sha256": "58c5bf08a2fcbdd686a0afa4acb47b027756cf3b3a6afb8d14b19e034d3ee03b",
+          "size": 20862,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
