@@ -1820,6 +1820,13 @@ export function createServerDrawer(
 			)
 			const folderSize = clamp(width - 32, 240, 320)
 
+			useEffect(() => {
+				if (closing) return
+				// A retained folder can reopen with an offset beyond its current pages.
+				setFolderPage(0)
+				folderPager.current?.scrollTo({ x: 0, y: 0, animated: false })
+			}, [closing, folderSize, pageSize, pages.length])
+
 			return (
 				<GestureDetector gesture={gesture}>
 					<AnimatedPressable
@@ -1849,6 +1856,7 @@ export function createServerDrawer(
 							<ScrollView
 								horizontal
 								pagingEnabled
+								removeClippedSubviews={false}
 								ref={folderPager}
 								showsHorizontalScrollIndicator={false}
 								style={{ height: folderHeight, width: folderSize }}
