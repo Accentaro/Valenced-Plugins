@@ -36,7 +36,7 @@
       "author": "Benjii <463702169443368970>",
       "icon": "SettingsIcon",
       "channels": {
-        "latest": "1.0.3"
+        "latest": "1.0.4"
       },
       "versions": {
         "1.0.0": {
@@ -77,6 +77,19 @@
               "version": "*"
             }
           }
+        },
+        "1.0.4": {
+          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.collapsible-ui@1.0.4.zip",
+          "sha256": "49c3aaf456d9e323470dfae2375a272656179cff298bdb799da3ba1c382d3a45",
+          "size": 24475,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
         }
       }
     },
@@ -89,7 +102,7 @@
       ],
       "icon": "MagicWandIcon",
       "channels": {
-        "latest": "1.0.1"
+        "latest": "1.0.2"
       },
       "versions": {
         "0.0.1": {
@@ -122,6 +135,19 @@
           "url": "https://plugins.benjiisworld.com/pool/dev.benjii.declutter@1.0.1.zip",
           "sha256": "1dad749405ed06752a8ef4bc5ca53a23b64f67a5cf59542228464d5dea6bef34",
           "size": 29563,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        },
+        "1.0.2": {
+          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.declutter@1.0.2.zip",
+          "sha256": "5f283bce695625a0b02bdae5b616c162075c5f90748f28ddf83e299f52eb8f54",
+          "size": 29581,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
@@ -272,13 +298,26 @@
       ],
       "icon": "ServersIcon",
       "channels": {
-        "latest": "1.0.0"
+        "latest": "1.0.4"
       },
       "versions": {
         "1.0.0": {
           "url": "https://plugins.benjiisworld.com/pool/dev.benjii.server-drawer@1.0.0.zip",
           "sha256": "8598b9a1209f36eb9bc8030fa0d03548b8b459f227e87911d4dbb4c2f3287978",
           "size": 36731,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        },
+        "1.0.4": {
+          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.server-drawer@1.0.4.zip",
+          "sha256": "2adb6a6f470a091123cbb5ae0b38f15049714bc3043ffdca58a4e5937d7dbb9b",
+          "size": 36788,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
