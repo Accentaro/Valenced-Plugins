@@ -1,3 +1,5 @@
+import { Tokens } from '@valenced/discord/common/tokens'
+import { Design } from '@valenced/discord/design'
 import { getModules, lookupModule } from '@valenced/modules/finders'
 import { withProps } from '@valenced/modules/finders/filters'
 import { after } from '@valenced/patcher'
@@ -19,9 +21,28 @@ import { DragStrip } from './DragStrip'
 import { usePullHandle } from './PullHandle'
 import { defaults } from './Settings'
 import type { PluginApi } from '@valenced/plugins/types'
-import type { ReactElement, ReactNode, RefObject } from 'react'
+import type { ComponentProps, ReactElement, ReactNode, RefObject } from 'react'
 import type { StyleProp, ViewStyle } from 'react-native'
 import type { Settings } from './Settings'
+
+let useHandleStyles: ReturnType<typeof Design.createStyles> | undefined
+
+function useChatSurfaceStyles() {
+	useHandleStyles ??= Design.createStyles({
+		surface: { backgroundColor: Tokens.default.colors.BACKGROUND_BASE_LOWER },
+	})
+	return useHandleStyles()
+}
+
+function ChatDragStrip(props: ComponentProps<typeof DragStrip>) {
+	const styles = useChatSurfaceStyles()
+	return (
+		<View style={styles.surface}>
+			<DragStrip {...props} />
+		</View>
+	)
+}
+
 export interface HostProps {
 	ref?: RefObject<{ dismissKeyboard(): void } | null>
 	children?: ReactNode
@@ -216,7 +237,7 @@ export function createChatUi({
 	}
 	function HeaderHandle({ bar }: { bar: HeaderBar }) {
 		return (
-			<DragStrip
+			<ChatDragStrip
 				library={bar.library}
 				gesture={bar.pull}
 				hidden={bar.hidden}
@@ -249,6 +270,7 @@ export function createChatUi({
 		inputRef?: HostProps['ref']
 	}) {
 		const { collapsibleInput } = useSettings()
+		const styles = useChatSurfaceStyles()
 		const onCollapse = useCallback(() => {
 			inputRef?.current?.dismissKeyboard()
 			Keyboard.dismiss()
@@ -346,9 +368,9 @@ export function createChatUi({
 				extrapolate: 'clamp',
 			})
 		return library && gesture && pull.gesture ? (
-			<AnimatedView style={{ flex: 0 }}>
+			<AnimatedView style={[styles.surface, { flex: 0 }]}>
 				<View collapsable={false} pointerEvents="box-none">
-					<DragStrip
+					<ChatDragStrip
 						library={library}
 						gesture={pull.gesture}
 						hidden={hidden}
