@@ -1,3 +1,4 @@
+
 <div align="center">
 
 # Valenced · Plugins
@@ -7,7 +8,7 @@
 A collection of personally maintained plugins for **[Valenced](https://github.com/Valenced/valenced)**, all are used by me personally and receive updates.
 
 [![Valenced](https://img.shields.io/badge/Client-Valenced-5865F2?style=flat-square)](https://github.com/Valenced/valenced)
-[![Plugins](https://img.shields.io/badge/Plugins-7-8B5CF6?style=flat-square)](#plugin-collection)
+[![Plugins](https://img.shields.io/badge/Plugins-8-8B5CF6?style=flat-square)](#plugin-collection)
 [![Licences](https://img.shields.io/badge/Licences-MPL--2.0%20%2F%20GPL--3.0-64748B?style=flat-square)](#licences--attribution)
 
 </div>
@@ -33,8 +34,6 @@ Then open **Browse Plugins** → install your chosen plugin → **enable it** �
 
 ### ◈ ServerDrawer
 
-**Servers & navigation**
-
 A compact server dock and searchable server/DM drawer with grid and list views, folders, drag-and-drop, unread indicators, native gestures and mark-as-read.
 
 <sub>**Contributors:** kmmiio99o · Rosie · Benjii</sub>
@@ -43,8 +42,6 @@ A compact server dock and searchable server/DM drawer with grid and list views, 
 <td width="50%" valign="top">
 
 ### ◈ Declutter
-
-**Interface cleanup**
 
 Hide profile cosmetics, server tags, badges, boost goals, DM activity cards and payment settings. Optionally remove emojis from channel names.
 
@@ -57,18 +54,14 @@ Hide profile cosmetics, server tags, badges, boost goals, DM activity cards and 
 
 ### ◈ CollapsibleUI
 
-**Interface customisation**
-
 Collapse selected interface elements to make better use of screen space.
 
-<sub>**Attribution:** To be confirmed from the plugin's source and history.</sub>
+<sub>**Attribution:** Benjii</sub>
 
 </td>
 <td valign="top">
 
 ### ◈ Better You Bar
-
-**Navigation shortcuts**
 
 Add quick-access favourites and settings buttons to the You bar.
 
@@ -81,8 +74,6 @@ Add quick-access favourites and settings buttons to the You bar.
 
 ### ◈ Quoter
 
-**Messages & sharing**
-
 Turn messages into quote images, preview them and send them as attachments.
 
 <sub>**Contributor:** Benjii · Third-party library: gifenc by Matt DesLauriers</sub>
@@ -91,8 +82,6 @@ Turn messages into quote images, preview them and send them as attachments.
 <td valign="top">
 
 ### ◈ GIF Providers
-
-**GIF search**
 
 Search Tenor, Giphy and Klipy together from Discord's GIF picker.
 
@@ -105,18 +94,27 @@ Search Tenor, Giphy and Klipy together from Discord's GIF picker.
 
 ### ◈ GIF to Chat Input
 
-**Message composing**
-
 Insert GIF picker selections into the chat input instead of sending them immediately.
 
 <sub>**Contributors:** j · Benjii</sub>
 
+</td>
+<td valign="top">
+
+### ◈ GitHub Repos
+
+Replaces Discord's native GitHub connection with a dedicated repositories page, displaying your repositories and contribution history.
+
+<sub>**Contributor:** Benjii</sub>
+
+</td>
 </tr>
 </table>
 
 ## About this repository
 
 Many of these plugins originated in other projects. **I am not claiming to be their original creator.** I contribute to, maintain and adapt versions to suit my own preferences.
+
 Only a few are my own plugins.
 
 This is where I keep everything so sometimes things might break. Stable releases will be added to the Valenced community repo, with fewer updates.
