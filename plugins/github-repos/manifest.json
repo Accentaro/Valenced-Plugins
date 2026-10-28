@@ -1,0 +1,14 @@
+{
+	"format": 1,
+	"id": "dev.benjii.github-repos",
+	"name": "Github Repos",
+	"description": "Browse repositories, stars and contributions from profile GitHub connections.",
+	"author": "Benjii <463702169443368970>",
+	"icon": "GithubIcon",
+	"version": "1.0.0",
+	"dependencies": {
+		"valenced.api": { "version": ">=1 <2" },
+		"discord": { "version": "*" }
+	},
+	"dist": { "script": "index.js" }
+}
