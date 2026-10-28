@@ -233,13 +233,26 @@
       "author": "Benjii <463702169443368970>",
       "icon": "GithubIcon",
       "channels": {
-        "latest": "1.0.0"
+        "latest": "1.0.1"
       },
       "versions": {
         "1.0.0": {
           "url": "https://plugins.benjiisworld.com/pool/dev.benjii.github-repos@1.0.0.zip",
           "sha256": "ad5efeddab3fda62d00e77802a8eb2453b1cb8fe940912ac561c7a98a64801ed",
           "size": 23611,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        },
+        "1.0.1": {
+          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.github-repos@1.0.1.zip",
+          "sha256": "5d7ae7a8e7cd38c76d4675d178e2df954b028e85be507dd683f27ad782bc0c6e",
+          "size": 23537,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
