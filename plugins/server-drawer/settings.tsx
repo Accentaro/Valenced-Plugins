@@ -12,6 +12,7 @@ export const DefaultSettings: ServerDrawerPreferences = {
 	softDockGestures: false,
 	haptics: false,
 	carousel: false,
+	animateAvatars: true,
 }
 
 export default function Settings({
@@ -24,10 +25,19 @@ export default function Settings({
 		softDockGestures = false,
 		haptics = false,
 		carousel = false,
+		animateAvatars = true,
 	} = jsonStorage.use() ?? DefaultSettings
 	return (
 		<ScrollView style={{ flex: 1 }}>
 			<Page>
+				<Design.TableRowGroup title="Appearance">
+					<Design.TableSwitchRow
+						label="Animate drawer avatars"
+						subLabel="Play animated server icons and DM avatars when the drawer is idle. Turn off for smoother performance."
+						value={animateAvatars}
+						onValueChange={value => jsonStorage.set({ animateAvatars: value })}
+					/>
+				</Design.TableRowGroup>
 				<Design.TableRowGroup title="Gestures">
 					<Design.TableSwitchRow
 						label="Soft dock gestures"

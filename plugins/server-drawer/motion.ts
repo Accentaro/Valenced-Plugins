@@ -301,36 +301,47 @@ export function createDrawerMotion(Gesture: t.NativeGestureModule['Gesture']) {
 			soft,
 		])
 
-		const reveal = (collapsed: number, opened: number) => {
-			if (soft) {
-				if (openingFrom === undefined) return expanded ? opened : collapsed
-				if (expanded && openingFrom === 0) return opened
+		const styles = useMemo(() => {
+			const reveal = (collapsed: number, opened: number) => {
+				if (soft) {
+					if (openingFrom === undefined) return expanded ? opened : collapsed
+					if (expanded && openingFrom === 0) return opened
+				}
+				return translate.interpolate({
+					inputRange: [
+						0,
+						soft && expanded ? Math.max(1, openingFrom ?? distance) : distance,
+					],
+					outputRange: [opened, collapsed],
+					extrapolate: 'clamp',
+				})
 			}
-			return translate.interpolate({
-				inputRange: [
-					0,
-					soft && expanded ? Math.max(1, openingFrom ?? distance) : distance,
-				],
-				outputRange: [opened, collapsed],
-				extrapolate: 'clamp',
-			})
-		}
-		const joined = panelHeight > maximum
-		return {
-			...gestures,
-			panelStyle: {
-				...(soft && {
-					height: reveal(dockHeight, panelHeight),
-					bottom: reveal(panelHeight - dockHeight, 0),
-					borderBottomLeftRadius: reveal(24, joined ? 0 : 24),
-					borderBottomRightRadius: reveal(24, joined ? 0 : 24),
-					borderBottomWidth: reveal(1, joined ? 0 : 1),
-				}),
-				transform: [{ translateY: translate }],
-			},
-			compactStyle: { opacity: reveal(1, 0) },
-			expandedStyle: { opacity: reveal(0, 1) },
-		}
+			const joined = panelHeight > maximum
+			return {
+				panelStyle: {
+					...(soft && {
+						height: reveal(dockHeight, panelHeight),
+						bottom: reveal(panelHeight - dockHeight, 0),
+						borderBottomLeftRadius: reveal(24, joined ? 0 : 24),
+						borderBottomRightRadius: reveal(24, joined ? 0 : 24),
+						borderBottomWidth: reveal(1, joined ? 0 : 1),
+					}),
+					transform: [{ translateY: translate }],
+				},
+				compactStyle: { opacity: reveal(1, 0) },
+				expandedStyle: { opacity: reveal(0, 1) },
+			}
+		}, [
+			distance,
+			dockHeight,
+			expanded,
+			maximum,
+			openingFrom,
+			panelHeight,
+			soft,
+			translate,
+		])
+		return { ...gestures, ...styles }
 	}
 
 	function usePageMotion(
@@ -403,23 +414,25 @@ export function createDrawerMotion(Gesture: t.NativeGestureModule['Gesture']) {
 			return () => progress.stopAnimation()
 		}, [folderId])
 
-		const interpolate = (outputRange: number[]) =>
-			progress.interpolate({
-				inputRange: [0, 1],
-				outputRange,
-				extrapolate: 'clamp',
-			})
+		return useMemo(() => {
+			const interpolate = (outputRange: number[]) =>
+				progress.interpolate({
+					inputRange: [0, 1],
+					outputRange,
+					extrapolate: 'clamp',
+				})
 
-		return {
-			rootStyle: {
-				opacity: interpolate([1, 0]),
-				transform: [{ translateY: interpolate([0, -24]) }],
-			},
-			folderStyle: {
-				opacity: interpolate([0, 1]),
-				transform: [{ translateY: interpolate([24, 0]) }],
-			},
-		}
+			return {
+				rootStyle: {
+					opacity: interpolate([1, 0]),
+					transform: [{ translateY: interpolate([0, -24]) }],
+				},
+				folderStyle: {
+					opacity: interpolate([0, 1]),
+					transform: [{ translateY: interpolate([24, 0]) }],
+				},
+			}
+		}, [progress])
 	}
 
 	function useFolderOverlayMotion(folderId: string | undefined) {

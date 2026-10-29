@@ -11,9 +11,11 @@ import {
 } from '@valenced/modules/finders/filters'
 import {
 	cloneElement,
+	createContext,
 	Fragment,
 	memo,
 	startTransition,
+	useContext,
 	useEffect,
 	useMemo,
 	useReducer,
@@ -530,7 +532,7 @@ export function createServerDrawer(
 						? iconUtils.getGuildIconURL({
 								id,
 								icon: guild.icon,
-								size: 128,
+								size: ICON_SIZE,
 								canAnimate: true,
 							})
 						: undefined,
@@ -634,7 +636,7 @@ export function createServerDrawer(
 
 					const animatedAvatarUri =
 						channel.type === 1 && users[0]?.avatar?.startsWith('a_')
-							? users[0].getAvatarURL(undefined, 128, true)
+							? users[0].getAvatarURL(undefined, ICON_SIZE, true)
 							: undefined
 
 					return [
@@ -1022,6 +1024,76 @@ export function createServerDrawer(
 			) : null
 		}
 
+		const AvatarReadyContext = createContext(false)
+		const AvatarActivityContext = createContext(() => {})
+
+		function AvatarPlayback({
+			playbackKey,
+			enabled,
+			children,
+			...props
+		}: import('react').ComponentPropsWithRef<typeof View> & {
+			playbackKey: string
+			enabled: boolean
+		}) {
+			const [avatarReadyFor, setAvatarReadyFor] = useState<string>()
+			const avatarTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+				undefined,
+			)
+			const avatarWork = useRef<{ cancel(): void } | undefined>(undefined)
+			const cancelAvatarResume = () => {
+				clearTimeout(avatarTimer.current)
+				avatarWork.current?.cancel()
+			}
+			const pauseAvatars = () => {
+				cancelAvatarResume()
+				setAvatarReadyFor(undefined)
+			}
+			const resumeAvatars = () => {
+				cancelAvatarResume()
+				// Wait for scroll events to stop and native drawer springs to settle.
+				avatarTimer.current = setTimeout(() => {
+					avatarWork.current = Native.InteractionManager.runAfterInteractions(
+						() => setAvatarReadyFor(playbackKey),
+					)
+				}, 150)
+			}
+			useEffect(() => {
+				pauseAvatars()
+				if (enabled) resumeAvatars()
+				return cancelAvatarResume
+			}, [enabled, playbackKey])
+			const handlers = useRef({ pauseAvatars, resumeAvatars })
+			handlers.current = { pauseAvatars, resumeAvatars }
+			const onScroll = useMemo(
+				() => () => {
+					handlers.current.pauseAvatars()
+					handlers.current.resumeAvatars()
+				},
+				[],
+			)
+			return (
+				<View
+					{...props}
+					onTouchStart={pauseAvatars}
+					onTouchEnd={resumeAvatars}
+					onTouchCancel={resumeAvatars}
+				>
+					<AvatarActivityContext.Provider value={onScroll}>
+						<AvatarReadyContext.Provider
+							value={enabled && avatarReadyFor === playbackKey}
+						>
+							{children}
+						</AvatarReadyContext.Provider>
+					</AvatarActivityContext.Provider>
+				</View>
+			)
+		}
+
+		function AnimatedArtwork(props: Native.ImageProps) {
+			return useContext(AvatarReadyContext) ? <Image {...props} /> : null
+		}
+
 		const Artwork = memo(function Artwork({
 			item,
 			size,
@@ -1098,7 +1170,7 @@ export function createServerDrawer(
 								style={{ borderRadius: radius, height: size, width: size }}
 							/>
 							{animatedUri && (
-								<Image
+								<AnimatedArtwork
 									accessibilityIgnoresInvertColors
 									resizeMode="cover"
 									source={animatedSource}
@@ -1409,7 +1481,36 @@ export function createServerDrawer(
 			const edge = 12
 			const width = slots * step - DOCK_ITEM_GAP + edge * 2
 			// Leave one offscreen item on each side of the faded viewport.
-			const items = nodes.length === slots + 1 ? [...nodes, ...nodes] : nodes
+			const items = useMemo(
+				() => (nodes.length === slots + 1 ? [...nodes, ...nodes] : nodes),
+				[nodes, slots],
+			)
+			const itemStyles = useMemo(
+				() =>
+					items.map((_, index) => {
+						const translateX = Native.Animated.subtract(
+							Native.Animated.modulo(
+								Native.Animated.add(position, (index + 1) * step),
+								items.length * step,
+							),
+							step,
+						)
+						return {
+							position: 'absolute' as const,
+							top: 6,
+							left: edge,
+							width: size,
+							height: size,
+							opacity: translateX.interpolate({
+								inputRange: [-step, 0, (slots - 1) * step, slots * step],
+								outputRange: [0, 1, 1, 0],
+								extrapolate: 'clamp',
+							}),
+							transform: [{ translateX }],
+						}
+					}),
+				[items.length, position, size, slots, step],
+			)
 			if (!MaskedView || !LinearGradient)
 				throw new Error('Server Drawer: native carousel mask is unavailable')
 			return (
@@ -1431,42 +1532,23 @@ export function createServerDrawer(
 					}
 				>
 					<AnimatedView style={{ flex: 1 }}>
-						{items.map((node, index) => {
-							const translateX = Native.Animated.subtract(
-								Native.Animated.modulo(
-									Native.Animated.add(position, (index + 1) * step),
-									items.length * step,
-								),
-								step,
-							)
-							return (
-								<AnimatedView
-									key={`${index}:${node.id}`}
-									style={{
-										position: 'absolute',
-										top: 6,
-										left: edge,
-										width: size,
-										height: size,
-										opacity: translateX.interpolate({
-											inputRange: [-step, 0, (slots - 1) * step, slots * step],
-											outputRange: [0, 1, 1, 0],
-											extrapolate: 'clamp',
-										}),
-										transform: [{ translateX }],
-									}}
-								>
-									{renderItem(node)}
-								</AnimatedView>
-							)
-						})}
+						{items.map((node, index) => (
+							<AnimatedView
+								key={`${index}:${node.id}`}
+								style={itemStyles[index]}
+							>
+								{renderItem(node)}
+							</AnimatedView>
+						))}
 					</AnimatedView>
 				</MaskedView>
 			)
 		}
 
 		function useDrawerData() {
-			const stored = jsonStorage.use() ?? DefaultSettings
+			const stored =
+				jsonStorage.use(update => !('drawerSession' in update)) ??
+				DefaultSettings
 			const [softDockGestures] = useState(
 				() => stored.softDockGestures ?? false,
 			)
@@ -1513,6 +1595,7 @@ export function createServerDrawer(
 				softDockGestures,
 				haptics: stored.haptics ?? false,
 				carousel: stored.carousel ?? false,
+				animateAvatars: stored.animateAvatars ?? true,
 			}
 		}
 
@@ -1805,6 +1888,7 @@ export function createServerDrawer(
 			backdropStyle,
 			panelStyle,
 		}: t.FolderOverlayProps) {
+			const onScroll = useContext(AvatarActivityContext)
 			const styles = useStyles()
 			const TEXT_DEFAULT: string = useToken(semanticColors.TEXT_DEFAULT)
 			const TEXT_MUTED: string = useToken(semanticColors.TEXT_MUTED)
@@ -1859,6 +1943,8 @@ export function createServerDrawer(
 								removeClippedSubviews={false}
 								ref={folderPager}
 								showsHorizontalScrollIndicator={false}
+								onScroll={onScroll}
+								scrollEventThrottle={32}
 								style={{ height: folderHeight, width: folderSize }}
 								onMomentumScrollEnd={(
 									event: Native.NativeSyntheticEvent<Native.NativeScrollEvent>,
@@ -1943,7 +2029,43 @@ export function createServerDrawer(
 			)
 		}
 
-		return function ServerDrawerSurface({
+		function RememberedList({
+			offset,
+			save,
+			...props
+		}: import('@shopify/flash-list').FlashListProps<t.DrawerItem> & {
+			offset: number
+			save(): void
+		}) {
+			const onScroll = useContext(AvatarActivityContext)
+			const list =
+				useRef<import('@shopify/flash-list').FlashListRef<t.DrawerItem>>(null)
+			const initialOffset = useRef(offset)
+			const loaded = useRef(false)
+			return (
+				<FlashList
+					{...props}
+					ref={list}
+					onLoad={() => {
+						list.current?.scrollToOffset({
+							offset: initialOffset.current,
+							animated: false,
+						})
+						loaded.current = true
+					}}
+					onScroll={event => {
+						if (loaded.current) {
+							onScroll()
+							props.onScroll?.(event)
+						}
+					}}
+					onScrollEndDrag={save}
+					onMomentumScrollEnd={save}
+				/>
+			)
+		}
+
+		function DrawerSurface({
 			bottomInset,
 			onWidthChange,
 			onFocusChange,
@@ -1979,14 +2101,34 @@ export function createServerDrawer(
 			const TEXT_MUTED: string = useToken(semanticColors.TEXT_MUTED)
 			const TEXT_DEFAULT: string = useToken(semanticColors.TEXT_DEFAULT)
 			const TEXT_BRAND: string = useToken(semanticColors.TEXT_BRAND)
+			const session = useRef({
+				view: jsonStorage.cache?.drawerSession?.view ?? 'servers',
+				folderId: jsonStorage.cache?.drawerSession?.folderId ?? null,
+				offsets: { ...jsonStorage.cache?.drawerSession?.offsets },
+			})
+			const saveSession = () => {
+				void jsonStorage.set({
+					drawerSession: {
+						...session.current,
+						offsets: { ...session.current.offsets },
+					},
+				})
+			}
 			const [ui, setUiState] = useState<t.DrawerState>({
 				expanded: false,
-				view: 'servers',
+				view: session.current.view,
+				folderId: session.current.folderId ?? undefined,
+				retainedFolderId: session.current.folderId ?? undefined,
 				filter: 'all',
 				query: '',
 			})
-			const setUi = (next: Partial<t.DrawerState>) =>
+			const setUi = (next: Partial<t.DrawerState>) => {
+				if (next.view) session.current.view = next.view
+				if ('folderId' in next) session.current.folderId = next.folderId ?? null
+				if ('view' in next || 'folderId' in next || 'expanded' in next)
+					saveSession()
 				setUiState(previous => ({ ...previous, ...next }))
+			}
 			const { expanded, view, filter, query, folderId, folderOverlayId } = ui
 			const closeFolder = () => setUi({ folderOverlayId: undefined })
 			const changeFolder = (folderId?: string) =>
@@ -2008,12 +2150,21 @@ export function createServerDrawer(
 				Native.AppState.currentState === 'active',
 			)
 
+			const playbackKey = `${expanded}:${view}:${folderId}:${folderOverlayId}:${foreground}`
+
 			useEffect(() => {
-				const subscription = Native.AppState.addEventListener('change', state =>
-					setForeground(state === 'active'),
+				const subscription = Native.AppState.addEventListener(
+					'change',
+					state => {
+						if (state !== 'active') saveSession()
+						setForeground(state === 'active')
+					},
 				)
 
-				return () => subscription.remove()
+				return () => {
+					subscription.remove()
+					saveSession()
+				}
 			}, [])
 
 			const {
@@ -2093,15 +2244,18 @@ export function createServerDrawer(
 			}, [drawerFolder, folderId, folderOverlayId, overlayFolder])
 
 			useEffect(() => {
-				setListAtTop(true)
-			}, [filter, folderId, data.layout, query])
+				setListAtTop(
+					(session.current.offsets[
+						view === 'servers' && folderId ? `folder:${folderId}` : view
+					] ?? 0) <= 0,
+				)
+			}, [view, filter, folderId, data.layout, query])
 
 			// Discord owns focus, current-callback tracking and subscription cleanup.
 			useNavigatorBackPressHandler(() => {
-				if (signal.aborted || (!expanded && !folderId && !folderOverlayId))
-					return false
+				if (signal.aborted || (!expanded && !folderOverlayId)) return false
 				if (folderOverlayId) closeFolder()
-				else if (folderId) changeFolder()
+				else if (view === 'servers' && folderId) changeFolder()
 				else setDrawerOpen(false, false)
 
 				return true
@@ -2110,9 +2264,8 @@ export function createServerDrawer(
 			function setDrawerOpen(open: boolean, reset = true) {
 				setUi({
 					expanded: open,
-					...(!open && reset ? { folderId: undefined, query: '' } : {}),
+					...(!open && reset ? { query: '' } : {}),
 				})
-				if (!open && reset) setListAtTop(true)
 			}
 
 			const open = (
@@ -2139,11 +2292,13 @@ export function createServerDrawer(
 				)
 			}
 
+			const selectItemRef = useRef(selectItem)
+			selectItemRef.current = selectItem
+
 			function changeView(next: t.DrawerView, open = false): void {
 				if (view === next && !open) return
 				drag.finish()
 				setUi({
-					folderId: undefined,
 					folderOverlayId: undefined,
 					query: '',
 					view: next,
@@ -2189,7 +2344,7 @@ export function createServerDrawer(
 								item.kind ? data.selectedGuildId : data.selectedPrivateChannelId
 							}
 							onPress={() => {
-								if (item.kind !== 'folder') return selectItem(item)
+								if (item.kind !== 'folder') return selectItemRef.current(item)
 								if (compactSize) changeView('servers', true)
 								changeFolder(item.id)
 							}}
@@ -2258,7 +2413,7 @@ export function createServerDrawer(
 				inFolder = false,
 				compactSize?: number,
 				page: t.DrawerView = view,
-				items = visible,
+				items = compactSize ? data.nodes : visible,
 				visiblePage = true,
 			) => {
 				const animated =
@@ -2273,7 +2428,6 @@ export function createServerDrawer(
 						item={item}
 						inFolder={inFolder}
 						compactSize={compactSize}
-						page={page}
 						items={items}
 						animate={
 							animated &&
@@ -2282,7 +2436,6 @@ export function createServerDrawer(
 							((expanded && page === view) || !!folderOverlayId) &&
 							foreground
 						}
-						expanded={expanded}
 						layout={data.layout}
 						width={viewportWidth}
 						selected={
@@ -2333,6 +2486,7 @@ export function createServerDrawer(
 						</View>
 						<View style={{ flex: 1 }}>
 							{folders.map(folder => {
+								const scrollKey = folder ? `folder:${folder.id}` : page
 								const hidden = folder
 									? folder.id !== folderId
 									: servers && !!drawerFolder
@@ -2358,7 +2512,9 @@ export function createServerDrawer(
 										}
 										style={[Native.StyleSheet.absoluteFill, motion]}
 									>
-										<FlashList
+										<RememberedList
+											offset={session.current.offsets[scrollKey] ?? 0}
+											save={saveSession}
 											data={items}
 											numColumns={columns}
 											ListEmptyComponent={
@@ -2390,6 +2546,11 @@ export function createServerDrawer(
 												nativeEvent: { contentOffset },
 											}: Native.NativeSyntheticEvent<Native.NativeScrollEvent>) => {
 												if (hidden || page !== view) return
+												if (!query && filter === 'all')
+													session.current.offsets[scrollKey] = Math.max(
+														0,
+														contentOffset.y,
+													)
 												const atTop = contentOffset.y <= 0
 												setListAtTop(previous =>
 													previous === atTop ? previous : atTop,
@@ -2439,11 +2600,21 @@ export function createServerDrawer(
 			}
 
 			return signal.aborted ? null : (
-				<View
+				<AvatarPlayback
+					playbackKey={playbackKey}
+					enabled={
+						data.animateAvatars && foreground && (expanded || !!folderOverlayId)
+					}
 					ref={root}
 					collapsable={false}
 					onLayout={({ nativeEvent: { layout } }: Native.LayoutChangeEvent) => {
-						if (layout.width > 0 && layout.height > 0) setViewport(layout)
+						if (layout.width > 0 && layout.height > 0)
+							setViewport(previous =>
+								previous.width === layout.width &&
+								previous.height === layout.height
+									? previous
+									: layout,
+							)
 						if (layout.width > 0) onWidthChange(layout.width)
 					}}
 					pointerEvents="box-none"
@@ -2653,7 +2824,7 @@ export function createServerDrawer(
 										>
 											<View style={{ height: drawerHeight - 16 }}>
 												<View style={styles.header}>
-													{drawerFolder ? (
+													{view === 'servers' && drawerFolder ? (
 														<>
 															<Icon
 																label="Back to all servers"
@@ -2778,7 +2949,7 @@ export function createServerDrawer(
 								item={active.source}
 								layout={data.layout}
 								previewWidth={previewWidth}
-								animate={expanded && foreground}
+								animate={false}
 							/>
 						</AnimatedView>
 					) : null}
@@ -2814,8 +2985,15 @@ export function createServerDrawer(
 								</View>
 							</View>
 						)}
-				</View>
+				</AvatarPlayback>
 			)
+		}
+		return function ServerDrawerSurface(props: t.ServerDrawerSurfaceProps) {
+			const [ready, setReady] = useState(!!jsonStorage.cache)
+			useEffect(() => {
+				if (!ready) void jsonStorage.get().then(() => setReady(true))
+			}, [ready])
+			return ready ? <DrawerSurface {...props} /> : null
 		}
 	}
 

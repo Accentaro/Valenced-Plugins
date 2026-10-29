@@ -43,12 +43,18 @@ export type DrawerLayout = 'grid' | 'list'
 export type DrawerView = 'dms' | 'servers'
 
 export interface ServerDrawerPreferences {
+	readonly drawerSession?: {
+		view: DrawerView
+		folderId: string | null
+		offsets: Record<string, number>
+	}
 	readonly dmOrder: readonly string[]
 	readonly layout: DrawerLayout
 	readonly pullToMarkRead: boolean
 	readonly softDockGestures: boolean
 	readonly haptics: boolean
 	readonly carousel: boolean
+	readonly animateAvatars: boolean
 }
 
 export interface DirectMessage extends BadgeState {
@@ -341,10 +347,8 @@ export interface DrawerCellProps {
 	item: DrawerItem
 	inFolder: boolean
 	compactSize?: number
-	page: DrawerView
 	items: readonly DrawerItem[]
 	animate: boolean
-	expanded: boolean
 	layout: DrawerLayout
 	width: number
 	selected: boolean

@@ -336,24 +336,11 @@ export function transformLeftPanelContent(
 	dockHeight: number,
 	focused = false,
 ) {
-	const [rail, content] = rendered.props.children
+	const [, content] = rendered.props.children
 	return React.cloneElement(rendered, {
 		children: [
-			<Native.View
-				key="rail"
-				accessibilityElementsHidden
-				importantForAccessibility="no-hide-descendants"
-				pointerEvents="none"
-				style={{
-					height: 1,
-					width: 1,
-					position: 'absolute',
-					left: -10000,
-					opacity: 0,
-				}}
-			>
-				{rail}
-			</Native.View>,
+			// Native children have initialized before this replacement mounts.
+			null,
 			React.cloneElement(content, {
 				style: [
 					content.props.style,
