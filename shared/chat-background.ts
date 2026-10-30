@@ -3,6 +3,11 @@ import type { ThemesState } from '@valenced/themes-api/types'
 import type { ReactElement } from 'react'
 import type { StyleProp, ViewStyle } from 'react-native'
 
+interface RootThemeContextModule {
+	RootThemeContextProvider(props: unknown): unknown
+	DisableCustomTheme: unknown
+}
+
 interface TypingIndicatorModule {
 	hasTypingIndicatorContent(...args: unknown[]): boolean
 }
@@ -22,7 +27,6 @@ export function fixChatBackground({ cleanup, plugin, unscoped }: PluginApi) {
 	let selected: ThemesState = JSON.parse(
 		native.callNativeMethodSync('valenced.themes.getState', []),
 	)
-	let running = true
 	const active = () =>
 		selected.colors?.plugin === plugin.manifest.id &&
 		(selected.background?.source === 'custom'
@@ -30,31 +34,24 @@ export function fixChatBackground({ cleanup, plugin, unscoped }: PluginApi) {
 			: selected.background?.source !== 'none')
 
 	cleanup(
-		() => {
-			running = false
-		},
-		// Track successful selections; never read native storage during rendering.
-		patcher.instead(native, 'callNativeMethod', function (args, original) {
-			const result = Reflect.apply(original, this, args)
-			const [name, params] = args
-			if (
-				name !== 'valenced.themes.setColors' &&
-				name !== 'valenced.themes.setBackground'
-			)
-				return result
-			const json = params[0] as string | null
-			return result.then(value => {
-				if (running) {
-					const field =
-						name === 'valenced.themes.setColors' ? 'colors' : 'background'
-					selected = {
-						...selected,
-						[field]: json === null ? undefined : JSON.parse(json),
-					}
-				}
-				return value
-			})
-		}),
+		finders.getModules(
+			withProps<RootThemeContextModule>(
+				'RootThemeContextProvider',
+				'DisableCustomTheme',
+			),
+			module => {
+				cleanup(
+					patcher.before(module, 'RootThemeContextProvider', args => {
+						// Theme selections refresh this provider before chat renders.
+						selected = JSON.parse(
+							native.callNativeMethodSync('valenced.themes.getState', []),
+						)
+						return args
+					}),
+				)
+			},
+			{ cached: true },
+		),
 		finders.getModules(
 			withProps<TypingIndicatorModule>('hasTypingIndicatorContent'),
 			module => {
@@ -95,7 +92,5 @@ export function fixChatBackground({ cleanup, plugin, unscoped }: PluginApi) {
 declare module '@valenced/modules/native' {
 	interface NativeMethods {
 		'valenced.themes.getState': [[], string]
-		'valenced.themes.setColors': [[json: string | null], null]
-		'valenced.themes.setBackground': [[json: string | null], null]
 	}
 }
