@@ -1,0 +1,22 @@
+{
+	"format": 1,
+	"id": "benjii.dev.theme.catppuccin",
+	"name": "Catppuccin",
+	"description": "The Catppuccin pastel palette in all four flavours: Latte, Frappé, Macchiato and Mocha.",
+	"author": "Benjii <463702169443368970>",
+	"version": "1.1.0",
+	"dependencies": {
+		"valenced.api": {
+			"version": ">=1 <2"
+		},
+		"discord": {
+			"version": ">=352.2"
+		},
+		"valenced.api.themes": {
+			"version": ">=1.0.1 <2"
+		}
+	},
+	"dist": {
+		"script": "index.js"
+	}
+}
