@@ -86,6 +86,10 @@ export function createServerDrawer(
 	const ITEM_GAP = 12
 	const SIDE_PADDING = 16
 
+	// Background themes turn Discord's surfaces translucent; the drawer always stays solid.
+	const opaque = (color: string) =>
+		/^#[0-9a-f]{8}$/i.test(color) ? color.slice(0, 7) : color
+
 	const FLOATING_YOU_BAR = Native.Platform.OS === 'ios'
 	const YOU_BAR_JOIN_DEPTH = FLOATING_YOU_BAR ? 0 : 24
 
@@ -1220,6 +1224,9 @@ export function createServerDrawer(
 			animate,
 		}: t.ItemProps) {
 			const styles = useStyles()
+			const PREVIEW_BACKGROUND = opaque(
+				useToken(semanticColors.BACKGROUND_SECONDARY_ALT),
+			)
 			const merging = useSyncExternalStore(
 				feedback?.subscribe ?? unsubscribed,
 				() => !!feedback?.merging(item.id),
@@ -1339,6 +1346,7 @@ export function createServerDrawer(
 					<View
 						style={[
 							styles.previewFrame,
+							{ backgroundColor: PREVIEW_BACKGROUND },
 							list
 								? [styles.listPreview, { width: previewWidth }]
 								: styles.gridPreview,
@@ -1892,6 +1900,9 @@ export function createServerDrawer(
 			const styles = useStyles()
 			const TEXT_DEFAULT: string = useToken(semanticColors.TEXT_DEFAULT)
 			const TEXT_MUTED: string = useToken(semanticColors.TEXT_MUTED)
+			const FOLDER_BACKGROUND = opaque(
+				useToken(semanticColors.BACKGROUND_SECONDARY_ALT),
+			)
 			const [folderPage, setFolderPage] = useState(0)
 			const folderPager = useRef<Native.ScrollView | null>(null)
 
@@ -1932,6 +1943,7 @@ export function createServerDrawer(
 							accessibilityRole="summary"
 							style={[
 								styles.folderPanel,
+								{ backgroundColor: FOLDER_BACKGROUND },
 								FLOATING_FOLDER_STYLE,
 								panelStyle,
 								{ height: folderHeight, width: folderSize },
@@ -2101,6 +2113,7 @@ export function createServerDrawer(
 			const TEXT_MUTED: string = useToken(semanticColors.TEXT_MUTED)
 			const TEXT_DEFAULT: string = useToken(semanticColors.TEXT_DEFAULT)
 			const TEXT_BRAND: string = useToken(semanticColors.TEXT_BRAND)
+			const SURFACE = opaque(useToken(semanticColors.BACKGROUND_BASE_LOWEST))
 			const session = useRef({
 				view: jsonStorage.cache?.drawerSession?.view ?? 'servers',
 				folderId: jsonStorage.cache?.drawerSession?.folderId ?? null,
@@ -2666,6 +2679,7 @@ export function createServerDrawer(
 									importantForAccessibility={expanded ? 'yes' : 'auto'}
 									style={[
 										styles.drawerPanel,
+										{ backgroundColor: SURFACE },
 										FLOATING_PANEL_STYLE,
 										{
 											bottom: 0,
@@ -2703,7 +2717,11 @@ export function createServerDrawer(
 											importantForAccessibility={
 												expanded ? 'no-hide-descendants' : 'auto'
 											}
-											style={[styles.compactFace, resize.compactStyle]}
+											style={[
+												styles.compactFace,
+												{ backgroundColor: SURFACE },
+												resize.compactStyle,
+											]}
 										>
 											<PanGestureHandler
 												enabled={
@@ -2820,7 +2838,11 @@ export function createServerDrawer(
 											importantForAccessibility={
 												expanded ? 'auto' : 'no-hide-descendants'
 											}
-											style={[styles.expandedFace, resize.expandedStyle]}
+											style={[
+												styles.expandedFace,
+												{ backgroundColor: SURFACE },
+												resize.expandedStyle,
+											]}
 										>
 											<View style={{ height: drawerHeight - 16 }}>
 												<View style={styles.header}>
