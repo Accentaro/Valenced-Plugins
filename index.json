@@ -3,6 +3,162 @@
   "name": "Valenced Plugins",
   "description": "Benjii's selected plugins for Valenced.",
   "plugins": {
+    "benjii.dev.theme.catppuccin": {
+      "name": "Catppuccin",
+      "description": "The Catppuccin pastel palette in all four flavours: Latte, Frappé, Macchiato and Mocha.",
+      "author": "Benjii <463702169443368970>",
+      "channels": {
+        "latest": "1.1.0"
+      },
+      "versions": {
+        "1.1.0": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.catppuccin@1.1.0.zip",
+          "sha256": "d1f7a5409498c45c9fdc572a17bfd256cb1d301c5393f9409386f06cd26b7254",
+          "size": 27781,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
+        }
+      }
+    },
+    "benjii.dev.theme.celestia": {
+      "name": "Celestia",
+      "description": "Plum and coral, over an anime sunset beneath a ringed planet.",
+      "author": "Benjii <463702169443368970>",
+      "channels": {
+        "latest": "1.1.0"
+      },
+      "versions": {
+        "1.1.0": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.celestia@1.1.0.zip",
+          "sha256": "2fe365da6b0b28d74fdd8137a1c1686e34fc2e69fb488b65cd5a36263521e94e",
+          "size": 192552,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
+        }
+      }
+    },
+    "benjii.dev.theme.frostfall": {
+      "name": "Frostfall",
+      "description": "Midnight snowfall: near-black surfaces with frosted white accents, over a falling-snow background.",
+      "author": "Benjii <463702169443368970>",
+      "channels": {
+        "latest": "1.1.0"
+      },
+      "versions": {
+        "1.1.0": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.frostfall@1.1.0.zip",
+          "sha256": "f89125af25b8bf22707c4b95c5d9701739d5accc3b16dcc859c3c9653b364dbe",
+          "size": 248092,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
+        }
+      }
+    },
+    "benjii.dev.theme.nocturne": {
+      "name": "Nocturne",
+      "description": "Navy and rain-lit cyan, over an anime night of blue rain beneath a crescent moon.",
+      "author": "Benjii <463702169443368970>",
+      "channels": {
+        "latest": "1.1.0"
+      },
+      "versions": {
+        "1.1.0": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.nocturne@1.1.0.zip",
+          "sha256": "db638d7e08d0cae128b8706f332fc6fe4bd4d700dc6621c23721977fe3d7f6df",
+          "size": 132728,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
+        }
+      }
+    },
+    "benjii.dev.theme.obsidian": {
+      "name": "Obsidian",
+      "description": "Pure black for OLED screens, with hairline borders and quiet silver accents.",
+      "author": "Benjii <463702169443368970>",
+      "channels": {
+        "latest": "1.1.0"
+      },
+      "versions": {
+        "1.1.0": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.obsidian@1.1.0.zip",
+          "sha256": "e43117e208f269d7af897125365f91a6e04ee9e07193f896716415ec95777c55",
+          "size": 26780,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
+        }
+      }
+    },
+    "benjii.dev.theme.sakura": {
+      "name": "Sakura",
+      "description": "A cozy, calm anime theme: cream manga paper, ink lines and sakura pastels, with a soft night version.",
+      "author": "Benjii <463702169443368970>",
+      "channels": {
+        "latest": "1.1.0"
+      },
+      "versions": {
+        "1.1.0": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.sakura@1.1.0.zip",
+          "sha256": "ddd04c184e9bde368e7ab8e0cb856877f5a8a5aac6a956e3d587d3a530391b17",
+          "size": 355217,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
+        }
+      }
+    },
     "dev.benjii.better-you-bar": {
       "name": "Better You Bar",
       "description": "Adds Favorites and Settings shortcuts to the You bar.",
@@ -311,7 +467,7 @@
       ],
       "icon": "ServersIcon",
       "channels": {
-        "latest": "1.0.5"
+        "latest": "1.0.6"
       },
       "versions": {
         "1.0.0": {
@@ -344,6 +500,19 @@
           "url": "https://plugins.benjiisworld.com/pool/dev.benjii.server-drawer@1.0.5.zip",
           "sha256": "452a0da97f0ff31aea60f2379c4c55e0ed39dab768739fc20aed148aa2f44b20",
           "size": 37725,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        },
+        "1.0.6": {
+          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.server-drawer@1.0.6.zip",
+          "sha256": "e4db2ec607a549e5881eaba7f7b81d023f9698ef95285cfd515019799c07e084",
+          "size": 37796,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
