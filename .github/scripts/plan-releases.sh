@@ -5,6 +5,6 @@ set -euo pipefail
 # shellcheck source=.github/scripts/lib.sh
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
-node node_modules/@valenced/plugin-cli/bin/valenced-plugin.js plan-releases --pool "$POOL_CHECKOUT/pool" --out "$PLAN"
+node node_modules/@valenced/plugin-cli/bin/valenced-plugin.js plan-releases --plugins-dir plugins --plugins-dir themes --pool "$POOL_CHECKOUT/pool" --out "$PLAN"
 
 echo "count=$(jq 'length' "$PLAN")" >> "$GITHUB_OUTPUT"
