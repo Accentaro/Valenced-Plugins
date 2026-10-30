@@ -34,7 +34,7 @@
       "description": "Plum and coral, over an anime sunset beneath a ringed planet.",
       "author": "Benjii <463702169443368970>",
       "channels": {
-        "latest": "1.1.1"
+        "latest": "1.1.2"
       },
       "versions": {
         "1.1.0": {
@@ -68,6 +68,22 @@
               "version": ">=1.0.1 <2"
             }
           }
+        },
+        "1.1.2": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.celestia@1.1.2.zip",
+          "sha256": "a87c3ddc918465f116467df095460e86d14adb354da8669ce48af54f4ff8cd5d",
+          "size": 193036,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
         }
       }
     },
@@ -76,7 +92,7 @@
       "description": "Midnight snowfall: near-black surfaces with frosted white accents, over a falling-snow background.",
       "author": "Benjii <463702169443368970>",
       "channels": {
-        "latest": "1.1.1"
+        "latest": "1.1.2"
       },
       "versions": {
         "1.1.0": {
@@ -110,6 +126,22 @@
               "version": ">=1.0.1 <2"
             }
           }
+        },
+        "1.1.2": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.frostfall@1.1.2.zip",
+          "sha256": "99d538912a536cf2f3411fac34b3297934dcd77157b73e962fb0c0d7f69a75c9",
+          "size": 248574,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
         }
       }
     },
@@ -118,7 +150,7 @@
       "description": "Navy and rain-lit cyan, over an anime night of blue rain beneath a crescent moon.",
       "author": "Benjii <463702169443368970>",
       "channels": {
-        "latest": "1.1.1"
+        "latest": "1.1.2"
       },
       "versions": {
         "1.1.0": {
@@ -141,6 +173,22 @@
           "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.nocturne@1.1.1.zip",
           "sha256": "7dd5238d1cc86f5bca88c3ae3159c4f637c7bc2238e4a93718af60b4c904db71",
           "size": 133321,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
+        },
+        "1.1.2": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.nocturne@1.1.2.zip",
+          "sha256": "f83369acc7a027897b423f2cb187153302a6d7fc4cb5ec725d0d4f70837bb0fe",
+          "size": 133214,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
@@ -186,7 +234,7 @@
       "description": "A cozy, calm anime theme: cream manga paper, ink lines and sakura pastels, with a soft night version.",
       "author": "Benjii <463702169443368970>",
       "channels": {
-        "latest": "1.1.1"
+        "latest": "1.1.2"
       },
       "versions": {
         "1.1.0": {
@@ -209,6 +257,22 @@
           "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.sakura@1.1.1.zip",
           "sha256": "a1c799fea3c2b01e9e6f30f3865b41d9b723e82d9911d2cbf925b76b14fdb550",
           "size": 355809,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
+        },
+        "1.1.2": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.sakura@1.1.2.zip",
+          "sha256": "221bb848e8165b5e69f3b690c253afe0d63c2d1cc10c62648535576c2e1469b7",
+          "size": 355700,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
