@@ -1,5 +1,6 @@
 /// <reference types="@valenced/themes-api" />
 
+import { fixChatBackground } from '../../../shared/chat-background'
 import { lazyColors } from '../../../shared/theme-kit'
 import type { Look, Palette, Tone } from '../../../shared/theme-kit'
 
@@ -162,6 +163,7 @@ const light: Look = {
 }
 
 export default plugin({
+	start: fixChatBackground,
 	preInit({ themes }) {
 		themes.registerGroup('nocturne', {
 			name: 'Nocturne',

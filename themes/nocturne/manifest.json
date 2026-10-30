@@ -4,7 +4,7 @@
 	"name": "Nocturne",
 	"description": "Navy and rain-lit cyan, over an anime night of blue rain beneath a crescent moon.",
 	"author": "Benjii <463702169443368970>",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"dependencies": {
 		"valenced.api": {
 			"version": ">=1 <2"

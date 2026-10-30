@@ -4,7 +4,7 @@
 	"name": "Sakura",
 	"description": "A cozy, calm anime theme: cream manga paper, ink lines and sakura pastels, with a soft night version.",
 	"author": "Benjii <463702169443368970>",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"dependencies": {
 		"valenced.api": {
 			"version": ">=1 <2"
