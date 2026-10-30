@@ -34,13 +34,29 @@
       "description": "Plum and coral, over an anime sunset beneath a ringed planet.",
       "author": "Benjii <463702169443368970>",
       "channels": {
-        "latest": "1.1.0"
+        "latest": "1.1.1"
       },
       "versions": {
         "1.1.0": {
           "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.celestia@1.1.0.zip",
           "sha256": "2fe365da6b0b28d74fdd8137a1c1686e34fc2e69fb488b65cd5a36263521e94e",
           "size": 192552,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
+        },
+        "1.1.1": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.celestia@1.1.1.zip",
+          "sha256": "363387da2ad8cec45cf9c13b00886b8636435dae6c120a47d96e103a40b22a92",
+          "size": 193143,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
@@ -60,13 +76,29 @@
       "description": "Midnight snowfall: near-black surfaces with frosted white accents, over a falling-snow background.",
       "author": "Benjii <463702169443368970>",
       "channels": {
-        "latest": "1.1.0"
+        "latest": "1.1.1"
       },
       "versions": {
         "1.1.0": {
           "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.frostfall@1.1.0.zip",
           "sha256": "f89125af25b8bf22707c4b95c5d9701739d5accc3b16dcc859c3c9653b364dbe",
           "size": 248092,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
+        },
+        "1.1.1": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.frostfall@1.1.1.zip",
+          "sha256": "5d8f000902b1d45802be4438955c46e89a508575d3516e80d14cb50b7070ce22",
+          "size": 248682,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
@@ -86,13 +118,29 @@
       "description": "Navy and rain-lit cyan, over an anime night of blue rain beneath a crescent moon.",
       "author": "Benjii <463702169443368970>",
       "channels": {
-        "latest": "1.1.0"
+        "latest": "1.1.1"
       },
       "versions": {
         "1.1.0": {
           "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.nocturne@1.1.0.zip",
           "sha256": "db638d7e08d0cae128b8706f332fc6fe4bd4d700dc6621c23721977fe3d7f6df",
           "size": 132728,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
+        },
+        "1.1.1": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.nocturne@1.1.1.zip",
+          "sha256": "7dd5238d1cc86f5bca88c3ae3159c4f637c7bc2238e4a93718af60b4c904db71",
+          "size": 133321,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
@@ -138,13 +186,29 @@
       "description": "A cozy, calm anime theme: cream manga paper, ink lines and sakura pastels, with a soft night version.",
       "author": "Benjii <463702169443368970>",
       "channels": {
-        "latest": "1.1.0"
+        "latest": "1.1.1"
       },
       "versions": {
         "1.1.0": {
           "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.sakura@1.1.0.zip",
           "sha256": "ddd04c184e9bde368e7ab8e0cb856877f5a8a5aac6a956e3d587d3a530391b17",
           "size": 355217,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
+        },
+        "1.1.1": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.sakura@1.1.1.zip",
+          "sha256": "a1c799fea3c2b01e9e6f30f3865b41d9b723e82d9911d2cbf925b76b14fdb550",
+          "size": 355809,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
