@@ -954,28 +954,6 @@ export function createServerDrawer(
 			lightImpact,
 		} = createDrawerMotion(Gesture)
 		const { Image, Pressable, ScrollView, Text, View, TextInput } = Native
-		const [MaskedView] = lookupModule(
-			withName<
-				import('react').ComponentType<
-					Native.ViewProps & {
-						maskElement: import('react').ReactElement
-					}
-				>
-			>('MaskedView'),
-		)
-		const [LinearGradient] = lookupModule(
-			withName<
-				import('react').ComponentType<
-					Native.ViewProps & {
-						colors: string[]
-						locations: number[]
-						start: { x: number; y: number }
-						end: { x: number; y: number }
-					}
-				>
-			>('LinearGradient'),
-		)
-
 		const { DragTarget, usePreview } = createDragMotion(
 			{ PanGestureHandler, State },
 			LONG_PRESS_MS,
@@ -1485,6 +1463,32 @@ export function createServerDrawer(
 			position: Native.Animated.Value
 			renderItem: (node: t.DrawerNode) => import('react').ReactNode
 		}) {
+			const { MaskedView, LinearGradient } = useMemo(() => {
+				const [MaskedView] = lookupModule(
+					withName<
+						import('react').ComponentType<
+							Native.ViewProps & {
+								maskElement: import('react').ReactElement
+							}
+						>
+					>('MaskedView'),
+					{ cached: false },
+				)
+				const [LinearGradient] = lookupModule(
+					withName<
+						import('react').ComponentType<
+							Native.ViewProps & {
+								colors: string[]
+								locations: number[]
+								start: { x: number; y: number }
+								end: { x: number; y: number }
+							}
+						>
+					>('LinearGradient'),
+					{ cached: false },
+				)
+				return { MaskedView, LinearGradient }
+			}, [])
 			const step = size + DOCK_ITEM_GAP
 			const edge = 12
 			const width = slots * step - DOCK_ITEM_GAP + edge * 2
@@ -1519,16 +1523,28 @@ export function createServerDrawer(
 					}),
 				[items.length, position, size, slots, step],
 			)
+			const viewportStyle = {
+				width,
+				height: size + 12,
+				marginHorizontal: -edge,
+				marginVertical: -6,
+				overflow: 'hidden' as const,
+			}
+			const content = (
+				<AnimatedView style={{ flex: 1 }}>
+					{items.map((node, index) => (
+						<AnimatedView key={`${index}:${node.id}`} style={itemStyles[index]}>
+							{renderItem(node)}
+						</AnimatedView>
+					))}
+				</AnimatedView>
+			)
+			// The edge mask is optional; item opacity still fades the clipped carousel.
 			if (!MaskedView || !LinearGradient)
-				throw new Error('Server Drawer: native carousel mask is unavailable')
+				return <View style={viewportStyle}>{content}</View>
 			return (
 				<MaskedView
-					style={{
-						width,
-						height: size + 12,
-						marginHorizontal: -edge,
-						marginVertical: -6,
-					}}
+					style={viewportStyle}
 					maskElement={
 						<LinearGradient
 							colors={['transparent', 'black', 'black', 'transparent']}
@@ -1539,16 +1555,7 @@ export function createServerDrawer(
 						/>
 					}
 				>
-					<AnimatedView style={{ flex: 1 }}>
-						{items.map((node, index) => (
-							<AnimatedView
-								key={`${index}:${node.id}`}
-								style={itemStyles[index]}
-							>
-								{renderItem(node)}
-							</AnimatedView>
-						))}
-					</AnimatedView>
+					{content}
 				</MaskedView>
 			)
 		}
