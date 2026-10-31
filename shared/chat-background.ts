@@ -8,6 +8,21 @@ interface RootThemeContextModule {
 	DisableCustomTheme: unknown
 }
 
+interface TokensModule {
+	RawColor: unknown
+	SemanticColor: unknown
+	default: {
+		internal: {
+			getSemanticColorName(color: object): string
+			resolveSemanticColor(
+				theme: string,
+				color: object,
+				context?: { gradient?: object | null; isProfileTheme?: boolean },
+			): string
+		}
+	}
+}
+
 interface TypingIndicatorModule {
 	hasTypingIndicatorContent(...args: unknown[]): boolean
 }
@@ -34,6 +49,39 @@ export function fixChatBackground({ cleanup, plugin, unscoped }: PluginApi) {
 			: selected.background?.source !== 'none')
 
 	cleanup(
+		finders.getModules(
+			withProps<TokensModule>('RawColor', 'SemanticColor'),
+			module => {
+				const { internal } = module.default
+				cleanup(
+					patcher.instead(
+						internal,
+						'resolveSemanticColor',
+						function (args, original) {
+							const result = Reflect.apply(original, this, args)
+							const [theme, color, context] = args
+							if (
+								active() &&
+								context?.gradient &&
+								!context.isProfileTheme &&
+								/^#[0-9a-f]{6}00$/i.test(result) &&
+								internal.getSemanticColorName(color) ===
+									'MOBILE_FLOATINGBAR_BACKGROUND'
+							) {
+								// The wallpaper renderer clears this surface; keep the You bar's own color.
+								return Reflect.apply(original, this, [
+									theme,
+									color,
+									{ ...context, gradient: null },
+								])
+							}
+							return result
+						},
+					),
+				)
+			},
+			{ cached: true },
+		),
 		finders.getModules(
 			withProps<RootThemeContextModule>(
 				'RootThemeContextProvider',

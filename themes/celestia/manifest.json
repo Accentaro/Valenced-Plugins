@@ -4,7 +4,7 @@
 	"name": "Celestia",
 	"description": "Plum and coral, over an anime sunset beneath a ringed planet.",
 	"author": "Benjii <463702169443368970>",
-	"version": "1.1.2",
+	"version": "1.1.3",
 	"dependencies": {
 		"valenced.api": {
 			"version": ">=1 <2"
