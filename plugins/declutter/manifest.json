@@ -6,7 +6,7 @@
 	"author": "Benjii <463702169443368970>",
 	"contributors": ["kmmiio99o"],
 	"icon": "MagicWandIcon",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"dependencies": {
 		"valenced.api": {
 			"version": ">=1 <2"
