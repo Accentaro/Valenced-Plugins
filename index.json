@@ -520,6 +520,30 @@
         }
       }
     },
+    "dev.benjii.feeds-page": {
+      "name": "Feeds Page",
+      "description": "Merge chosen channels into one chat. Replies, reactions and messages still go to each message's own channel. Change channel by long pressing send button.",
+      "author": "Benjii <463702169443368970>",
+      "icon": "ChatIcon",
+      "channels": {
+        "latest": "1.0.0"
+      },
+      "versions": {
+        "1.0.0": {
+          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.feeds-page@1.0.0.zip",
+          "sha256": "c25e405b947bb3741f8b4d0a90c18ec3e9c631cf33f5521ba4002b2db22de2ef",
+          "size": 24092,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        }
+      }
+    },
     "dev.benjii.gif-providers": {
       "name": "GIF Providers",
       "description": "Search Tenor, Giphy and Klipy together in the GIF picker.",
