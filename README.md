@@ -8,7 +8,7 @@
 A collection of personally maintained plugins for **[Valenced](https://github.com/Valenced/valenced)**, all are used by me personally and receive updates.
 
 [![Valenced](https://img.shields.io/badge/Client-Valenced-5865F2?style=flat-square)](https://github.com/Valenced/valenced)
-[![Plugins](https://img.shields.io/badge/Plugins-8-8B5CF6?style=flat-square)](#plugin-collection)
+[![Plugins](https://img.shields.io/badge/Plugins-9-8B5CF6?style=flat-square)](#plugin-collection)
 [![Themes](https://img.shields.io/badge/Themes-6-EC4899?style=flat-square)](#theme-collection)
 [![Licences](https://img.shields.io/badge/Licences-MPL--2.0%20%2F%20GPL--3.0-64748B?style=flat-square)](#licences--attribution)
 
@@ -109,6 +109,18 @@ Replaces Discord's native GitHub connection with a dedicated repositories page, 
 <sub>**Contributor:** Benjii</sub>
 
 </td>
+</tr>
+<tr>
+<td valign="top">
+
+### ◈ Feeds Page
+
+Combine selected channels into one chat feed. Add channels from their long-press menu, open the feed from the You bar, and hold the send button to choose where new messages go. Replies and reactions stay with their original channels.
+
+<sub>**Contributor:** Benjii</sub>
+
+</td>
+<td></td>
 </tr>
 </table>
 
