@@ -248,6 +248,9 @@ export function toneMapper(tone: Tone) {
 /** Sets the alpha of a `#RRGGBB` or `#RRGGBBAA` colour. */
 const alpha = (color: string, value: string) => color.slice(0, 7) + value
 
+/** Makes a `#RRGGBB` colour opaque. Theme backgrounds make six-digit colours inherit Discord's gradient, fading action sheets and emoji buttons. */
+const solid = (color: string) => (color.length === 7 ? `${color}ff` : color)
+
 /** Semantic colours from a {@link Palette}. */
 export function paint(p: Palette): Record<string, string> {
 	return {
@@ -295,18 +298,18 @@ export function paint(p: Palette): Record<string, string> {
 		MOBILE_FLOATINGBAR_BACKGROUND_NAMEPLATE: p.card,
 		MOBILE_FLOATING_ACCESSORY_BACKGROUND: p.popup,
 		CUSTOM_STATUS_BUBBLE_BG: p.popup,
-		CARD_BACKGROUND_DEFAULT: p.card,
-		CARD_MUTED_BG: p.card,
-		CARD_SECONDARY_BG: p.card,
-		CARD_SECONDARY_BACKGROUND_DEFAULT: p.card,
-		CARD_MUTED_PRESSED_BG: p.pressed,
-		CARD_PRIMARY_PRESSED_BG: p.pressed,
-		CARD_SECONDARY_PRESSED_BG: p.pressed,
-		CARD_SECONDARY_BACKGROUND_ACTIVE: p.pressed,
-		TABLEROW_BACKGROUND_DEFAULT: p.card,
-		TABLEROW_BACKGROUND_PRESSED: p.pressed,
-		BACKGROUND_APP_LAUNCHER_CARD_DEFAULT: p.card,
-		BACKGROUND_APP_LAUNCHER_ROW_DEFAULT: p.card,
+		CARD_BACKGROUND_DEFAULT: solid(p.card),
+		CARD_MUTED_BG: solid(p.card),
+		CARD_SECONDARY_BG: solid(p.card),
+		CARD_SECONDARY_BACKGROUND_DEFAULT: solid(p.card),
+		CARD_MUTED_PRESSED_BG: solid(p.pressed),
+		CARD_PRIMARY_PRESSED_BG: solid(p.pressed),
+		CARD_SECONDARY_PRESSED_BG: solid(p.pressed),
+		CARD_SECONDARY_BACKGROUND_ACTIVE: solid(p.pressed),
+		TABLEROW_BACKGROUND_DEFAULT: solid(p.card),
+		TABLEROW_BACKGROUND_PRESSED: solid(p.pressed),
+		BACKGROUND_APP_LAUNCHER_CARD_DEFAULT: solid(p.card),
+		BACKGROUND_APP_LAUNCHER_ROW_DEFAULT: solid(p.card),
 		CHAT_BANNER_BG: p.card,
 		EMBED_BACKGROUND: p.card,
 		EMBED_BACKGROUND_ALTERNATE: p.card,
@@ -314,7 +317,7 @@ export function paint(p: Palette): Record<string, string> {
 		MOBILE_THREAD_EMBED_BACKGROUND: p.card,
 		MOBILE_COMMAND_CATEGORIES_BACKGROUND: p.card,
 		MOBILE_GUILDBAR_ICON_BACKGROUND_DEFAULT: p.card,
-		MOBILE_EMOJI_BUTTON_BACKGROUND: p.control,
+		MOBILE_EMOJI_BUTTON_BACKGROUND: solid(p.control),
 		MOBILE_SEGMENTED_CONTROL_BACKGROUND: p.card,
 		MOBILE_SEGMENTED_CONTROL_INDICATOR_BACKGROUND: p.control,
 		MOBILE_VOICE_MESSAGE_RECORDING_LOCK_BACKGROUND_DEFAULT: p.card,
