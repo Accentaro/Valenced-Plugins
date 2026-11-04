@@ -55,41 +55,99 @@ export interface Group {
 	key: string
 	element: GroupElement
 	entries: Entry[]
+	passthrough?: ReactNode
+}
+
+type RowElement = ReactElement<SurfaceRowProps>
+function isRow(node: ReactNode): node is RowElement {
+	return (
+		isValidElement<SurfaceRowProps>(node) &&
+		(node.type === Design.ActionSheetRow ||
+			(node.props.label != null && isValidElement(node.props.icon)))
+	)
+}
+
+function isGroup(node: ReactNode): node is GroupElement {
+	return (
+		isValidElement<{ children?: ReactNode }>(node) &&
+		componentName(node.type) === 'ActionSheetRowGroup'
+	)
+}
+
+function labelText(label: ReactNode): string | undefined {
+	if (typeof label === 'string' || typeof label === 'number')
+		return String(label).trim() || undefined
+	if (isValidElement<{ children?: ReactNode }>(label))
+		return labelText(label.props.children)
+}
+
+// Prefer icons and keys because labels change with locale.
+function fallbackIds(row: RowElement): string[] {
+	const ids: string[] = []
+	const icon = row.props.icon
+	if (isValidElement<{ IconComponent?: unknown }>(icon)) {
+		const name = componentName(icon.props.IconComponent)
+		if (name) ids.push(`icon:${name}`)
+	}
+	const key = row.key?.match(/\$([^$]+)$/)?.[1]
+	if (key) ids.push(`key:${key}`)
+	const label = labelText(row.props.label)
+	if (label) ids.push(`label:${label}`)
+	return ids
 }
 
 function readGroups(sheet: SheetElement, surface: SurfaceDefinition): Group[] {
-	const groups = Children.toArray(sheet.props.children).flatMap(element => {
-		if (
-			!isValidElement<{ children?: ReactNode }>(element) ||
-			componentName(element.type) !== 'ActionSheetRowGroup'
-		)
-			throw new Error('Action groups changed; customisation was skipped')
-		const entries = Children.toArray(element.props.children).map(
-			(row, index) => ({
-				row,
-				key: isValidElement(row) && row.key !== null ? row.key : String(index),
-				id:
-					isValidElement<SurfaceRowProps>(row) &&
-					row.type === Design.ActionSheetRow
-						? surface.identify(row)
-						: undefined,
-			}),
+	const children = Children.toArray(sheet.props.children)
+	const template = children.find(isGroup)
+	const candidates = new Map<Entry, string[]>()
+	const groups = children.flatMap((element, position): Group[] => {
+		let group: GroupElement
+		if (isGroup(element)) group = element
+		else if (isRow(element) && template)
+			group = cloneElement(template, {
+				key: `adopted:${element.key ?? position}`,
+				children: element,
+			})
+		else
+			return [
+				{
+					key: `passthrough:${isValidElement(element) ? element.key : position}`,
+					element: <></>,
+					entries: [],
+					passthrough: element,
+				},
+			]
+		let primary: string | undefined
+		const entries = Children.toArray(group.props.children).map(
+			(row, index) => {
+				const entry: Entry = {
+					row,
+					key:
+						isValidElement(row) && row.key !== null ? row.key : String(index),
+				}
+				if (isRow(row)) {
+					const id = surface.identify(row)
+					primary ??= id
+					candidates.set(entry, [...(id ? [id] : []), ...fallbackIds(row)])
+				}
+				return entry
+			},
 		)
 		return [
 			{
-				key: `actions:${entries.find(entry => entry.id)?.id ?? element.key}`,
-				element,
+				// Keep section IDs stable when plugin rows change.
+				key: `actions:${primary ?? group.key}`,
+				element: group,
 				entries,
 			},
 		]
 	})
 	const counts = new Map<string, number>()
-	for (const { entries } of groups)
-		for (const { id } of entries)
-			if (id) counts.set(id, (counts.get(id) ?? 0) + 1)
+	for (const ids of candidates.values())
+		for (const id of new Set(ids)) counts.set(id, (counts.get(id) ?? 0) + 1)
 	for (const { entries } of groups)
 		for (const entry of entries) {
-			if (entry.id && counts.get(entry.id) !== 1) entry.id = undefined
+			entry.id = candidates.get(entry)?.find(id => counts.get(id) === 1)
 			entry.key = entry.id ?? entry.key
 		}
 	return groups
@@ -364,7 +422,7 @@ function EditableSheet({
 			<SectionEditor
 				inSheet
 				header={header}
-				groups={groups}
+				groups={groups.filter(group => !group.passthrough)}
 				preferences={preferences}
 				onChange={save}
 			/>
@@ -372,6 +430,7 @@ function EditableSheet({
 			[
 				inlineToolbar ? null : toolbar,
 				...arranged.flatMap(group => {
+					if (group.passthrough) return [group.passthrough]
 					const children = group.entries
 						.filter(
 							entry => !entry.id || !preferences.hidden.includes(entry.id),
