@@ -546,7 +546,7 @@
       ],
       "icon": "MagicWandIcon",
       "channels": {
-        "latest": "1.0.3"
+        "latest": "1.0.4"
       },
       "versions": {
         "0.0.1": {
@@ -605,6 +605,19 @@
           "url": "https://plugins.benjiisworld.com/pool/dev.benjii.declutter@1.0.3.zip",
           "sha256": "34bfe19fc2a574c6d6f5ca1fc03d60ada843e20b61dcbab69405a54e4ba39d46",
           "size": 29923,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        },
+        "1.0.4": {
+          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.declutter@1.0.4.zip",
+          "sha256": "82a90ebcf2907e654c10b85fe42e6b18ee3cbbfb65726ac4cd8e7fb3626eb994",
+          "size": 30223,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
@@ -690,13 +703,26 @@
       ],
       "icon": "GifIcon",
       "channels": {
-        "latest": "1.0.0"
+        "latest": "1.0.1"
       },
       "versions": {
         "1.0.0": {
           "url": "https://plugins.benjiisworld.com/pool/dev.benjii.gif-to-chat-input@1.0.0.zip",
           "sha256": "8c5fdc5d95a2b1a23bbdac774e78226b26b795ba9e879e4270f2603411c33594",
           "size": 17609,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        },
+        "1.0.1": {
+          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.gif-to-chat-input@1.0.1.zip",
+          "sha256": "1f254e8ea2e26aec205e4e0e06cbd3433b8082fac10eccaa6c50fa3f612d03f6",
+          "size": 17932,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
@@ -751,7 +777,7 @@
       "author": "Benjii <463702169443368970>",
       "icon": "QuoteIcon",
       "channels": {
-        "latest": "1.0.2"
+        "latest": "1.0.3"
       },
       "versions": {
         "1.0.0": {
@@ -771,6 +797,19 @@
           "url": "https://plugins.benjiisworld.com/pool/dev.benjii.quoter@1.0.2.zip",
           "sha256": "10691a2603a520d34ac8bbeef731991cc417682261d2529f90269476f545a637",
           "size": 36992,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        },
+        "1.0.3": {
+          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.quoter@1.0.3.zip",
+          "sha256": "bd3bd4e1ebc3f098b30d7f9f014640bddc731e8e5d01c3b99329b50d8d3c055b",
+          "size": 37096,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
