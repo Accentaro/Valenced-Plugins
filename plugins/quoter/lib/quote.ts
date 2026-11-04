@@ -152,9 +152,24 @@ function getMessageAuthor(message: QuoteMessage) {
 	return message?.author ?? {}
 }
 
-function getDisplayName(author: QuoteAuthor): string {
+function getGuildId(message: QuoteMessage): string | undefined {
+	const channelId = getMessageChannelId(message)
+	const channels = Stores.ChannelStore as unknown as {
+		getChannel(id: string): { guild_id?: string } | undefined
+	}
+	return channelId ? channels.getChannel(channelId)?.guild_id : undefined
+}
+
+function getDisplayName(author: QuoteAuthor, guildId?: string): string {
+	const members = Stores.GuildMemberStore as unknown as {
+		getNick(guildId: string, userId: string): string | null | undefined
+	}
 	return (
-		author?.globalName || author?.global_name || author?.username || 'Unknown'
+		(guildId && author?.id && members.getNick(guildId, author.id)) ||
+		author?.globalName ||
+		author?.global_name ||
+		author?.username ||
+		'Unknown'
 	)
 }
 
@@ -166,10 +181,15 @@ function getAuthorUsername(author: QuoteAuthor): string {
 	)
 }
 
-function getAvatarUrl(author: QuoteAuthor): string {
+function getAvatarUrl(author: QuoteAuthor, guildId?: string): string {
 	try {
-		if (typeof author?.getAvatarURL === 'function') {
-			return sizeUpgrade(author.getAvatarURL())
+		// Message author copies lack server avatars.
+		const users = Stores.UserStore as unknown as {
+			getUser(id: string): QuoteAuthor | undefined
+		}
+		const user = (author?.id && users.getUser(author.id)) || author
+		if (typeof user?.getAvatarURL === 'function') {
+			return sizeUpgrade(user.getAvatarURL(guildId, 512))
 		}
 	} catch {}
 
@@ -224,6 +244,7 @@ export function buildPayload(
 	includeReply = false,
 ): QuotePayload {
 	const author = getMessageAuthor(message)
+	const guildId = getGuildId(message)
 	const reply =
 		options.allowReplies && includeReply ? getReply(message) : undefined
 	const replyAuthor = reply && getMessageAuthor(reply)
@@ -244,8 +265,8 @@ export function buildPayload(
 								: getQuoteMedia(reply).length
 									? '[Media]'
 									: '[Message]'),
-						displayName: reply.nick || getDisplayName(replyAuthor),
-						avatarUrl: getAvatarUrl(replyAuthor),
+						displayName: reply.nick || getDisplayName(replyAuthor, guildId),
+						avatarUrl: getAvatarUrl(replyAuthor, guildId),
 						color: /^#[\da-f]{6}$/i.test(
 							reply.colorString ?? replyAuthor.colorString ?? '',
 						)
@@ -254,14 +275,14 @@ export function buildPayload(
 					}
 				: undefined,
 		quote: quoteText(text, options.quotationMarks) || ' ',
-		displayName: (message.nick || getDisplayName(author)).slice(0, 64),
+		displayName: (message.nick || getDisplayName(author, guildId)).slice(0, 64),
 		authorColor: /^#[\da-f]{6}$/i.test(message.colorString ?? '')
 			? message.colorString!
 			: '#f2f3f5',
 		isBot: Boolean(author.bot),
 		timestamp: formatTimestamp(message),
 		username: `@${getAuthorUsername(author)}`,
-		avatarUrl: getAvatarUrl(author),
+		avatarUrl: getAvatarUrl(author, guildId),
 		grayscale: Boolean(options.grayscale),
 		showWatermark: Boolean(options.showWatermark),
 		watermark: String(options.watermark || '').slice(0, 32),

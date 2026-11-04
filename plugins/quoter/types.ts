@@ -16,7 +16,7 @@ export interface QuoteAuthor {
 	username?: string
 	globalName?: string
 	global_name?: string
-	getAvatarURL?(): string
+	getAvatarURL?(guildId?: string, size?: number): string
 }
 export interface QuoteMedia {
 	url: string
