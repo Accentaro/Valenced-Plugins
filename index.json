@@ -456,13 +456,26 @@
       ],
       "icon": "StarIcon",
       "channels": {
-        "latest": "1.0.0"
+        "latest": "1.0.1"
       },
       "versions": {
         "1.0.0": {
           "url": "https://plugins.benjiisworld.com/pool/dev.benjii.better-you-bar@1.0.0.zip",
           "sha256": "65a6fce36e9da4b4fd8a12cfc57f86eeaba522a3eb3ba6e9b77921eb371fee99",
           "size": 19307,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        },
+        "1.0.1": {
+          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.better-you-bar@1.0.1.zip",
+          "sha256": "48be021bad01be9eb7f94362efb426958ec2a2c9bac7ea370f9499f06bfb2e98",
+          "size": 19452,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
