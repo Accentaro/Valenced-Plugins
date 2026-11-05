@@ -1,4 +1,5 @@
 import { Design } from '@valenced/discord/design'
+import { Stores } from '@valenced/discord/flux'
 import { RootNavigationRef } from '@valenced/discord/modules/main_tabs_v2'
 import { getModuleWithImportedPath } from '@valenced/discord/utils/modules/finders'
 import { lookupModule } from '@valenced/modules/finders'
@@ -7,11 +8,48 @@ import { instead } from '@valenced/patcher'
 import { lookupGeneratedIconComponent } from '@valenced/utils/discord'
 import { patchLocalFavorites } from './favorites'
 import SettingsComponent, { defaults } from './Settings'
+import type { DiscordModules } from '@valenced/discord/types'
 import type * as React from 'react'
 import type { Settings } from './Settings'
 
 type Notifications = {
 	type(props: { hasNameplate?: boolean }): React.ReactNode
+}
+
+type Store<T> = DiscordModules.Flux.Store<T>
+
+let returnTo: { guildId?: string; channelId?: string } | undefined
+
+// First tap opens Favorites and remembers where you were; tapping again while still there goes back and so on.
+function toggleFavorites(guilds: { transitionToGuild(id: string): void }) {
+	const { SelectedGuildStore, SelectedChannelStore, ChannelStore } = Stores as {
+		SelectedGuildStore: Store<{ getGuildId(): string | undefined }>
+		SelectedChannelStore: Store<{ getChannelId(): string | undefined }>
+		ChannelStore: Store<{ getChannel(id: string): object | undefined }>
+	}
+	const guildId = SelectedGuildStore.getGuildId() ?? undefined
+	if (guildId !== '@favorites') {
+		returnTo = { guildId, channelId: SelectedChannelStore.getChannelId() }
+		guilds.transitionToGuild('@favorites')
+		return
+	}
+	const previous = returnTo
+	returnTo = undefined
+	if (!previous) return
+	if (previous.guildId) return guilds.transitionToGuild(previous.guildId)
+	// DM or group dm, reopen it, otherwise fall back to the dm list.
+	const [channels] = lookupModule(
+		withProps<{ transitionToChannel(id: string, options: object): void }>(
+			'transitionToChannel',
+		),
+	)
+	if (
+		previous.channelId &&
+		ChannelStore.getChannel(previous.channelId) &&
+		channels
+	)
+		channels.transitionToChannel(previous.channelId, {})
+	else guilds.transitionToGuild('@me')
 }
 
 export default plugin<{ jsonStorage: Settings }>({
@@ -71,7 +109,7 @@ export default plugin<{ jsonStorage: Settings }>({
 												/>
 											}
 											accessibilityLabel="Favorites"
-											onPress={() => guilds.transitionToGuild('@favorites')}
+											onPress={() => toggleFavorites(guilds)}
 										/>
 									)}
 									{notification}
