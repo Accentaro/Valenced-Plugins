@@ -1,0 +1,14 @@
+{
+	"format": 1,
+	"id": "dev.benjii.dyslexia-friendly-fonts",
+	"name": "Dyslexia Friendly Fonts",
+	"description": "OpenDyslexic, Lexend and Atkinson Hyperlegible font choices for reading comfort.",
+	"author": "Benjii <463702169443368970>",
+	"version": "1.0.0",
+	"dependencies": {
+		"valenced.api": { "version": ">=1 <2" },
+		"discord": { "version": "*" },
+		"valenced.api.themes": { "version": ">=1 <2" }
+	},
+	"dist": { "script": "index.js" }
+}
