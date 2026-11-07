@@ -5,10 +5,10 @@
   "plugins": {
     "benjii.dev.theme.catppuccin": {
       "name": "Catppuccin",
-      "description": "The Catppuccin pastel palette in all four flavours: Latte, Frappé, Macchiato and Mocha.",
+      "description": "The Catppuccin pastel palette in all four flavours (Latte, Frappé, Macchiato and Mocha), each with all 14 accent colours.",
       "author": "Benjii <463702169443368970>",
       "channels": {
-        "latest": "1.1.1"
+        "latest": "1.2.1"
       },
       "versions": {
         "1.1.0": {
@@ -31,6 +31,22 @@
           "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.catppuccin@1.1.1.zip",
           "sha256": "2c301f7c13b54f2080b1eb82d3260399954ebb61f4ffe039d8be4358684e6782",
           "size": 27808,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
+        },
+        "1.2.1": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.catppuccin@1.2.1.zip",
+          "sha256": "bbb52547cdfaa939a6861ee27d6ca70384532e3f69113dc49e80ab5f163790b4",
+          "size": 28813,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
@@ -637,6 +653,32 @@
             },
             "discord": {
               "version": "*"
+            }
+          }
+        }
+      }
+    },
+    "dev.benjii.dyslexia-friendly-fonts": {
+      "name": "Dyslexia Friendly Fonts",
+      "description": "OpenDyslexic, Lexend and Atkinson Hyperlegible font choices for reading comfort.",
+      "author": "Benjii <463702169443368970>",
+      "channels": {
+        "latest": "1.0.0"
+      },
+      "versions": {
+        "1.0.0": {
+          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.dyslexia-friendly-fonts@1.0.0.zip",
+          "sha256": "ef18d142c46f27cce5e924ea920450b5657ecd74093146322f0a3dba907fd770",
+          "size": 772190,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            },
+            "valenced.api.themes": {
+              "version": ">=1 <2"
             }
           }
         }
