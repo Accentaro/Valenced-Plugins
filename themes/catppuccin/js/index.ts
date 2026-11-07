@@ -1,6 +1,9 @@
 /// <reference types="@valenced/themes-api" />
 
-import { lazyColors, mix } from '../../../shared/theme-kit'
+import { mix, themeColors } from '../../../shared/theme-kit'
+import Settings from './settings'
+import type { JsonStorage } from '@valenced/json-storage'
+import type { ThemeColors } from '@valenced/themes-api/types'
 import type { Look, Palette, Tone } from '../../../shared/theme-kit'
 
 // Official Catppuccin palette (MIT): https://github.com/catppuccin/palette
@@ -120,7 +123,7 @@ const macchiato: Flavour = {
 	crust: '#181926',
 }
 
-const mocha: Flavour = {
+export const mocha: Flavour = {
 	rosewater: '#f5e0dc',
 	flamingo: '#f2cdcd',
 	pink: '#f5c2e7',
@@ -149,12 +152,30 @@ const mocha: Flavour = {
 	crust: '#11111b',
 }
 
-/** Discord's greys and hues as Catppuccin colours. Each Discord hue takes its nearest Catppuccin colour. */
+/** Catppuccin's accent colours, in the order of its style guide. */
+export const accents = [
+	'rosewater',
+	'flamingo',
+	'pink',
+	'mauve',
+	'red',
+	'maroon',
+	'peach',
+	'yellow',
+	'green',
+	'teal',
+	'sky',
+	'sapphire',
+	'blue',
+	'lavender',
+] as const
+export type Accent = (typeof accents)[number]
+
 /**
  * Discord's greys and hues as Catppuccin colours, with `night` on dark appearances and Latte on Light.
- * Each Discord hue takes its nearest Catppuccin colour, from the theme's own flavour.
+ * Each Discord hue takes its nearest Catppuccin colour, from the theme's own flavour, and blurple the accent.
  */
-function toneOf(night: Flavour, own: Flavour): Tone {
+function toneOf(night: Flavour, own: Flavour, accent: Accent): Tone {
 	const light = own === latte
 	// Dark flavours darken the pastels so Discord's white text and icons stay readable on fills.
 	const fill = (c: string, t = 0.3) => (light ? c : mix(c, own.crust, t))
@@ -183,14 +204,15 @@ function toneOf(night: Flavour, own: Flavour): Tone {
 			green: fill(own.green, 0.2),
 			teal: fill(own.teal, 0.25),
 			blue: fill(own.blue),
-			blurple: fill(own.mauve, 0.45),
+			blurple: fill(own[accent], 0.45),
 			purple: fill(own.lavender),
 			pink: fill(own.pink),
 		},
 	}
 }
 
-function lookOf(f: Flavour, light: boolean): Look {
+function lookOf(f: Flavour, light: boolean, accent: Accent): Look {
+	const a = f[accent]
 	const palette: Palette = {
 		rail: f.crust,
 		floor: f.base,
@@ -215,20 +237,20 @@ function lookOf(f: Flavour, light: boolean): Look {
 		border: `${f.overlay0}4d`,
 		borderStrong: `${f.overlay0}99`,
 
-		accent: f.mauve,
-		accentPress: mix(f.mauve, f.base, 0.15),
+		accent: a,
+		accentPress: mix(a, f.base, 0.15),
 		onAccent: light ? f.base : f.crust,
-		accentSoft: `${f.mauve}33`,
-		accentText: f.mauve,
-		// Discord draws white icons on the brand fill, so darken pastel mauve under them.
-		brand: light ? f.mauve : mix(f.mauve, f.crust, 0.45),
-		rowIcon: f.mauve,
+		accentSoft: `${a}33`,
+		accentText: a,
+		// Discord draws white icons on the brand fill, so darken the pastel accent under them.
+		brand: light ? a : mix(a, f.crust, 0.45),
+		rowIcon: a,
 		// Catppuccin's selection colour: overlay2 at 25%.
 		selection: `${f.overlay2}40`,
 
 		link: f.blue,
-		mentionText: f.mauve,
-		mentionPill: `${f.mauve}33`,
+		mentionText: a,
+		mentionPill: `${a}33`,
 		mentionBg: `${f.yellow}1a`,
 		replyBg: `${f.blue}1a`,
 		keyword: `${f.peach}40`,
@@ -246,7 +268,6 @@ function lookOf(f: Flavour, light: boolean): Look {
 	return {
 		palette,
 		extra: {
-			// Catppuccin's status colours.
 			STATUS_ONLINE: f.green,
 			ICON_STATUS_ONLINE: f.green,
 			TEXT_STATUS_ONLINE: f.green,
@@ -282,27 +303,67 @@ const flavours = [
 	['latte', 'Latte', latte, 'The light flavour. Mocha on dark appearances.'],
 ] as const
 
-export default plugin({
+export interface CatppuccinStorage {
+	accent: Accent
+	/** Discord's raw palette retained for accent changes. */
+	raw?: Record<string, string>
+}
+
+let storage: JsonStorage<CatppuccinStorage> | undefined
+
+export const accentOf = (): Accent => storage?.cache?.accent ?? 'mauve'
+
+export function colorsOf(
+	id: string,
+	accent: Accent,
+	discord: { raw: Record<string, string> },
+): ThemeColors {
+	const [, , flavour] = flavours.find(f => f[0] === id)!
+	const night = flavour === latte ? mocha : flavour
+	const dark = lookOf(night, false, accent)
+	return themeColors(discord, toneOf(night, flavour, accent), {
+		dark,
+		darker: dark,
+		midnight: dark,
+		light: lookOf(latte, true, accent),
+	})
+}
+
+export const flavourIds = flavours.map(f => f[0])
+
+export default plugin<{ jsonStorage: CatppuccinStorage }>({
+	jsonStorage: { load: true, default: { accent: 'mauve' } },
 	preInit({ themes }) {
 		themes.registerGroup('catppuccin', {
 			name: 'Catppuccin',
-			description: 'Soothing pastel theme, with mauve accents.',
+			description:
+				'Soothing pastel theme. Pick a flavour here and an accent in the plugin settings.',
 		})
 
-		for (const [id, name, flavour, about] of flavours) {
-			const night = flavour === latte ? mocha : flavour
-			const dark = lookOf(night, false)
-
+		for (const [id, name, , about] of flavours) {
+			const cache = new Map<Accent, ThemeColors>()
 			themes.registerTheme('catppuccin', id, {
 				name: `Catppuccin ${name}`,
 				description: about,
-				getColors: lazyColors(toneOf(night, flavour), {
-					dark,
-					darker: dark,
-					midnight: dark,
-					light: lookOf(latte, true),
-				}),
+				getColors(discord) {
+					if (storage && !storage.cache?.raw)
+						storage.set({
+							...storage.cache,
+							raw: discord.raw,
+						} as CatppuccinStorage)
+					const accent = accentOf()
+					let colors = cache.get(accent)
+					if (!colors)
+						cache.set(accent, (colors = colorsOf(id, accent, discord)))
+					return colors
+				},
 			})
 		}
 	},
+	init({ jsonStorage }) {
+		storage = jsonStorage
+	},
+	// Valenced only opens the settings page of started plugins.
+	start() {},
+	SettingsComponent: Settings,
 })
