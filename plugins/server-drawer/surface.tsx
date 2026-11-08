@@ -3,7 +3,7 @@ import SearchInput from '@valenced/components/SearchInput'
 import { Design } from '@valenced/discord/design'
 import { ReactNativeSafeAreaContext } from '@valenced/externals/react-native-safe-area-context'
 import { FlashList as Shopify } from '@valenced/externals/shopify'
-import { lookupModule } from '@valenced/modules/finders'
+import { getModules, lookupModule } from '@valenced/modules/finders'
 import {
 	withDependencies,
 	withName,
@@ -841,21 +841,32 @@ export function createServerDrawer(
 	}
 
 	function createGuildMenu(signal: AbortSignal, folder = false) {
-		const getItems = folder
-			? lookupModule(
-					withProps<{
-						getGuildFolderMenuItems(id: string | number): t.MenuItem[]
-					}>('getGuildFolderMenuItems').and(
-						withStoreDependencies('SortedGuildStore'),
-					),
-				)[0]?.getGuildFolderMenuItems
-			: lookupModule(
-					withName<(id: string | number) => t.MenuItem[]>(
-						'getGuildsBarGuildMenuItems',
-					),
-				)[0]
-		if (typeof getItems !== 'function')
-			throw new Error('ServerDrawer: native guild menu is unavailable')
+		type GetItems = (id: string | number) => t.MenuItem[]
+		let getItems: GetItems | undefined
+		const listeners = new Set<() => void>()
+		if (folder) {
+			getItems = lookupModule(
+				withProps<{ getGuildFolderMenuItems: GetItems }>(
+					'getGuildFolderMenuItems',
+				).and(withStoreDependencies('SortedGuildStore')),
+			)[0]?.getGuildFolderMenuItems
+			if (typeof getItems !== 'function')
+				throw new Error('ServerDrawer: native folder menu is unavailable')
+		} else {
+			// Discord loads the guild menu builder with its native GuildsBar, which can render after the drawer.
+			const unsubscribe = getModules(
+				withName<GetItems>('getGuildsBarGuildMenuItems'),
+				items => {
+					getItems = items
+					for (const listener of listeners) listener()
+				},
+			)
+			signal.addEventListener('abort', unsubscribe)
+		}
+		const subscribe = (listener: () => void) => {
+			listeners.add(listener)
+			return () => listeners.delete(listener)
+		}
 
 		const wrap = (item: t.MenuItem): t.MenuItem => ({
 			...item,
@@ -868,7 +879,11 @@ export function createServerDrawer(
 			},
 		})
 
-		return function GuildMenu({ guild, children }: t.GuildMenuProps) {
+		function NativeGuildMenu({
+			guild,
+			children,
+			getItems,
+		}: t.GuildMenuProps & { getItems: GetItems }) {
 			// Discord stores folder IDs as numbers; guild snowflakes remain strings.
 			const id = folder ? Number(guild.id) : guild.id
 
@@ -911,6 +926,15 @@ export function createServerDrawer(
 				>
 					{children}
 				</ContextMenu>
+			)
+		}
+
+		return function GuildMenu(props: t.GuildMenuProps) {
+			const items = useSyncExternalStore(subscribe, () => getItems)
+			return items ? (
+				<NativeGuildMenu {...props} getItems={items} />
+			) : (
+				props.children()
 			)
 		}
 	}

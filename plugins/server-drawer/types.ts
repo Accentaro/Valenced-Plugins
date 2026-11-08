@@ -188,7 +188,7 @@ export type NativeMenuAnchor = Parameters<
 
 export interface GuildMenuProps {
 	guild: DrawerNode
-	children(props: NativeMenuAnchor): ReactNode
+	children(props?: NativeMenuAnchor): ReactNode
 }
 
 export interface DragFeedback {
