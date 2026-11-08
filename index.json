@@ -886,7 +886,7 @@
       ],
       "icon": "ServersIcon",
       "channels": {
-        "latest": "1.0.7"
+        "latest": "1.0.8"
       },
       "versions": {
         "1.0.0": {
@@ -945,6 +945,19 @@
           "url": "https://plugins.benjiisworld.com/pool/dev.benjii.server-drawer@1.0.7.zip",
           "sha256": "ffb75c200244fc8a907bfd2e186b35c931d21e36394ac005024bb7414379a420",
           "size": 37833,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        },
+        "1.0.8": {
+          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.server-drawer@1.0.8.zip",
+          "sha256": "7bcfcf8d345ab679ea3d7714ecd2fe56535f2e04d77c27c32c3d1f7cd2ad8bc9",
+          "size": 37924,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
