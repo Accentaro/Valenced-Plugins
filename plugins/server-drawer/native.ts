@@ -59,6 +59,7 @@ export function getNative() {
 		GuildStore,
 		PrivateChannelSortStore,
 		ReadStateStore,
+		RelationshipStore,
 		SelectedChannelStore,
 		SelectedGuildStore,
 		SortedGuildStore,
@@ -74,6 +75,7 @@ export function getNative() {
 		ReadStateStore: Store<
 			t.ReadStore & { lastMessageId(id: string): string | undefined }
 		>
+		RelationshipStore: Store<{ getNickname(id: string): string | undefined }>
 		SelectedChannelStore: Store<{ getChannelId(): string | undefined }>
 		SelectedGuildStore: Store<{ getGuildId(): string | undefined }>
 		SortedGuildStore: Store<{
@@ -97,6 +99,7 @@ export function getNative() {
 		GuildStore,
 		PrivateChannelSortStore,
 		ReadStateStore,
+		RelationshipStore,
 		SelectedChannelStore,
 		SelectedGuildStore,
 		SortedGuildStore,

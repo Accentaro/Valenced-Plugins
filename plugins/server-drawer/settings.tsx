@@ -8,6 +8,8 @@ import type { ServerDrawerPreferences } from './types'
 export const DefaultSettings: ServerDrawerPreferences = {
 	dmOrder: [],
 	layout: 'grid',
+	dmLayout: 'grid',
+	preferFriendNicknames: true,
 	pullToMarkRead: false,
 	softDockGestures: false,
 	haptics: false,
@@ -26,6 +28,7 @@ export default function Settings({
 		haptics = false,
 		carousel = false,
 		animateAvatars = true,
+		preferFriendNicknames = true,
 	} = jsonStorage.use() ?? DefaultSettings
 	return (
 		<ScrollView style={{ flex: 1 }}>
@@ -36,6 +39,14 @@ export default function Settings({
 						subLabel="Play animated server icons and DM avatars when the drawer is idle. Turn off for smoother performance."
 						value={animateAvatars}
 						onValueChange={value => jsonStorage.set({ animateAvatars: value })}
+					/>
+					<Design.TableSwitchRow
+						label="Prefer friend nicknames"
+						subLabel="Show the nicknames you gave your friends instead of their display names in direct messages."
+						value={preferFriendNicknames}
+						onValueChange={value =>
+							jsonStorage.set({ preferFriendNicknames: value })
+						}
 					/>
 				</Design.TableRowGroup>
 				<Design.TableRowGroup title="Gestures">
