@@ -1,0 +1,21 @@
+{
+	"format": 1,
+	"id": "dev.benjii.better-chatbox",
+	"name": "Better Chatbox",
+	"description": "Adds your avatar to the chatbox and lets you give the chatbox a custom colour or image background.",
+	"author": "LampDelivery <650805815623680030>",
+	"contributors": ["Benjii <463702169443368970>"],
+	"icon": "ChatIcon",
+	"version": "1.0.0",
+	"dependencies": {
+		"valenced.api": {
+			"version": ">=1 <2"
+		},
+		"discord": {
+			"version": "*"
+		}
+	},
+	"dist": {
+		"script": "index.js"
+	}
+}
