@@ -484,6 +484,8 @@ export interface Look {
 	palette: Palette
 	/** Theme-specific semantic colours, applied last. */
 	extra?: Record<string, string>
+	/** Tone for this base's semantic colours, when it differs from the theme's main tone. */
+	tone?: Tone
 }
 
 type Base = 'dark' | 'darker' | 'light' | 'midnight'
@@ -503,7 +505,8 @@ export function themeColors(
 	for (const [base, look] of Object.entries(looks) as [Base, Look][]) {
 		const colors: Record<string, string> = {}
 		const defaults = base === 'light' ? LightColors : AshColors
-		for (const name in defaults) colors[name] = map(defaults[name]!)
+		const mapLook = look.tone ? toneMapper(look.tone) : map
+		for (const name in defaults) colors[name] = mapLook(defaults[name]!)
 		semantic[base] = Object.assign(colors, paint(look.palette), look.extra)
 	}
 	const raw: Record<string, string> = {}

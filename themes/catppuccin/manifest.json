@@ -4,7 +4,7 @@
 	"name": "Catppuccin",
 	"description": "The Catppuccin pastel palette in all four flavours (Latte, Frappé, Macchiato and Mocha), each with all 14 accent colours.",
 	"author": "Benjii <463702169443368970>",
-	"version": "1.2.1",
+	"version": "1.3.0",
 	"dependencies": {
 		"valenced.api": {
 			"version": ">=1 <2"

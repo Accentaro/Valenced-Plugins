@@ -172,66 +172,86 @@ export const accents = [
 export type Accent = (typeof accents)[number]
 
 /**
- * Discord's greys and hues as Catppuccin colours, with `night` on dark appearances and Latte on Light.
- * Each Discord hue takes its nearest Catppuccin colour, from the theme's own flavour, and blurple the accent.
+ * Discord's greys and hues as colours of one flavour, mapped from Ash on dark flavours and from Light on
+ * Latte. Each Discord hue takes its nearest Catppuccin colour, and blurple the accent.
  */
-function toneOf(night: Flavour, own: Flavour, accent: Accent): Tone {
-	const light = own === latte
+function toneOf(f: Flavour, accent: Accent): Tone {
+	const light = f === latte
 	// Dark flavours darken the pastels so Discord's white text and icons stay readable on fills.
-	const fill = (c: string, t = 0.3) => (light ? c : mix(c, own.crust, t))
+	const fill = (c: string, t = 0.3) => (light ? c : mix(c, f.crust, t))
+	const greys: Tone['greys'] = light
+		? [
+				// Light: dark greys are text, light greys are surfaces.
+				['#000000', mix(f.text, '#000000', 0.5)],
+				['#28282d', f.text],
+				['#2e2e34', f.text],
+				['#595a63', f.subtext1],
+				['#6c6d76', f.subtext0],
+				['#81828a', f.overlay2],
+				['#97979f', f.overlay1],
+				['#abacb2', f.overlay0],
+				['#c5c6ca', f.surface2],
+				['#dbdcdf', f.surface1],
+				['#e6e7e9', f.surface0],
+				['#f3f3f4', f.crust],
+				['#fbfbfb', f.base],
+				['#ffffff', mix(f.base, '#ffffff', 0.5)],
+			]
+		: [
+				// Ash: dark greys are surfaces, light greys are text. Discord's white is Catppuccin's text, as
+				// in Catppuccin's own Discord ports, never Latte.
+				['#000000', mix(f.crust, '#000000', 0.4)],
+				['#2c2d32', f.crust],
+				['#323339', f.base],
+				['#393a41', f.surface0],
+				['#41434a', f.surface0],
+				['#4e5058', f.surface1],
+				['#595a63', f.surface2],
+				['#81828a', f.overlay0],
+				['#97979f', f.overlay1],
+				['#abacb2', f.overlay2],
+				['#c5c6ca', f.subtext0],
+				['#dbdcdf', f.subtext1],
+				['#f3f3f4', f.text],
+				['#ffffff', f.text],
+			]
 	return {
-		greys: [
-			['#000000', mix(night.crust, '#000000', 0.4)],
-			['#2c2d32', night.crust],
-			['#323339', night.base],
-			['#393a41', night.surface0],
-			['#41434a', night.surface0],
-			['#4e5058', night.surface1],
-			['#595a63', night.surface2],
-			['#81828a', night.overlay0],
-			['#97979f', night.overlay1],
-			['#abacb2', night.overlay2],
-			['#c5c6ca', night.subtext0],
-			['#efeff1', latte.crust],
-			['#f3f3f4', latte.mantle],
-			['#fbfbfb', latte.base],
-			['#ffffff', mix(latte.base, '#ffffff', 0.5)],
-		],
+		greys,
 		hues: {
-			red: fill(own.red),
-			orange: fill(own.peach, 0.15),
-			yellow: fill(own.yellow, 0.1),
-			green: fill(own.green, 0.2),
-			teal: fill(own.teal, 0.25),
-			blue: fill(own.blue),
-			blurple: fill(own[accent], 0.45),
-			purple: fill(own.lavender),
-			pink: fill(own.pink),
+			red: fill(f.red),
+			orange: fill(f.peach, 0.15),
+			yellow: fill(f.yellow, 0.1),
+			green: fill(f.green, 0.2),
+			teal: fill(f.teal, 0.25),
+			blue: fill(f.blue),
+			blurple: fill(f[accent], 0.45),
+			purple: fill(f.lavender),
+			pink: fill(f.pink),
 		},
 	}
 }
 
 function lookOf(f: Flavour, light: boolean, accent: Accent): Look {
 	const a = f[accent]
+	// Surfaces follow Catppuccin's Vendetta port: crust, mantle and base, with surface0 kept for embeds
+	// and secondary buttons.
 	const palette: Palette = {
 		rail: f.crust,
 		floor: f.base,
 		panel: f.mantle,
-		// Latte lifts cards above the page instead of greying them with surface0.
-		page: light ? f.mantle : f.base,
-		card: light ? f.base : f.surface0,
-		popup: light ? f.base : f.surface0,
-		input: light ? f.crust : f.surface0,
-		control: light ? f.surface0 : f.surface1,
-		pressed: light ? f.surface1 : f.surface2,
+		page: f.mantle,
+		card: f.base,
+		popup: light ? f.base : f.mantle,
+		input: f.mantle,
+		control: f.surface0,
+		pressed: f.surface1,
 
 		heading: f.text,
 		strong: f.text,
-		text: f.subtext1,
-		subtle: f.subtext0,
-		// overlay2 is too faint on Latte's surfaces for timestamps and hints.
-		muted: light ? f.subtext0 : f.overlay2,
-		faint: f.overlay1,
+		text: f.text,
+		subtle: f.subtext1,
+		muted: f.subtext0,
+		faint: f.overlay2,
 
 		divider: `${f.overlay0}33`,
 		border: `${f.overlay0}4d`,
@@ -248,16 +268,16 @@ function lookOf(f: Flavour, light: boolean, accent: Accent): Look {
 		// Catppuccin's selection colour: overlay2 at 25%.
 		selection: `${f.overlay2}40`,
 
-		link: f.blue,
+		link: a,
 		mentionText: a,
-		mentionPill: `${a}33`,
-		mentionBg: `${f.yellow}1a`,
+		mentionPill: `${a}4d`,
+		mentionBg: `${f.yellow}17`,
 		replyBg: `${f.blue}1a`,
 		keyword: `${f.peach}40`,
 		code: f.mantle,
 		codeText: f.pink,
 		spoiler: f.surface2,
-		spoilerRevealed: f.surface0,
+		spoilerRevealed: `${f.surface2}40`,
 
 		positive: f.green,
 		warning: f.yellow,
@@ -267,7 +287,16 @@ function lookOf(f: Flavour, light: boolean, accent: Accent): Look {
 	}
 	return {
 		palette,
+		tone: toneOf(f, accent),
 		extra: {
+			// Text fields sit on crust and embeds on surface0, as in the Vendetta port.
+			INPUT_BACKGROUND_DEFAULT: f.crust,
+			EMBED_BACKGROUND: f.surface0,
+			EMBED_BACKGROUND_ALTERNATE: f.surface0,
+			MOBILE_EMBED_BACKGROUND_DEFAULT: f.surface0,
+			MOBILE_THREAD_EMBED_BACKGROUND: f.surface0,
+			SPINE_DEFAULT: f.surface2,
+			THREAD_CHANNEL_SPINE: f.surface2,
 			STATUS_ONLINE: f.green,
 			ICON_STATUS_ONLINE: f.green,
 			TEXT_STATUS_ONLINE: f.green,
@@ -321,7 +350,8 @@ export function colorsOf(
 	const [, , flavour] = flavours.find(f => f[0] === id)!
 	const night = flavour === latte ? mocha : flavour
 	const dark = lookOf(night, false, accent)
-	return themeColors(discord, toneOf(night, flavour, accent), {
+	// Each look maps Discord's colours with its own flavour's tone; the raw palette follows the theme's own.
+	return themeColors(discord, toneOf(flavour, accent), {
 		dark,
 		darker: dark,
 		midnight: dark,
