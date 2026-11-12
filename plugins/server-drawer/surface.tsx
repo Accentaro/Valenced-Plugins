@@ -2932,7 +2932,11 @@ export function createServerDrawer(
 															jsonStorage.set(
 																view === 'dms'
 																	? { dmLayout: grid ? 'list' : 'grid' }
-																	: { layout: grid ? 'list' : 'grid' },
+																	: {
+																			layout: grid ? 'list' : 'grid',
+																			// Pin the DM layout, which otherwise falls back to this one.
+																			dmLayout: data.layouts.dms,
+																		},
 															)
 														}
 														name={grid ? 'ListViewIcon' : 'GridSquareIcon'}
