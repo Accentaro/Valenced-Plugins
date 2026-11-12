@@ -38,9 +38,23 @@ export function parseCalendar(html: string): Day[] {
 	return [...days.values()].sort((a, b) => a.date.localeCompare(b.date))
 }
 
+// Classic or fine-grained personal access token; the strict charset also keeps it header-safe.
+export const validToken = (value: unknown): value is string =>
+	typeof value === 'string' &&
+	/^(?:ghp_[A-Za-z\d]{36,255}|github_pat_\w{60,255})$/.test(value)
+
 const cache = new Map<string, { expires: number; value: unknown }>()
 const inFlight = new Map<string, Promise<unknown>>()
 const requests = new Set<AbortController>()
+let token: string | undefined
+
+export function setToken(value: unknown) {
+	const next = validToken(value) ? value : undefined
+	if (next === token) return
+	token = next
+	// Drop requests and results made with the previous credentials.
+	clearData()
+}
 
 function repoUrl(login: string, page: number) {
 	return `https://api.github.com/users/${login}/repos?per_page=100&sort=updated&page=${page}`
@@ -100,17 +114,23 @@ async function fetchData<T>(
 	requests.add(controller)
 	const timeout = setTimeout(() => controller.abort(), 15000)
 	try {
+		// The token is only for the REST API; contribution HTML on github.com never gets it.
+		const authorized =
+			token !== undefined && url.startsWith('https://api.github.com/')
 		const response = await fetch(url, {
 			signal: controller.signal,
 			credentials: 'omit',
+			headers: authorized ? { Authorization: `Bearer ${token}` } : undefined,
 		})
 		if (!response.ok)
 			throw new Error(
-				response.status === 403 || response.status === 429
-					? 'GitHub rate limit reached. Try again later.'
-					: response.status === 404
-						? 'GitHub account not found.'
-						: 'GitHub could not be loaded.',
+				authorized && response.status === 401
+					? 'GitHub token was rejected. Update it in plugin settings.'
+					: response.status === 403 || response.status === 429
+						? 'GitHub rate limit reached. Try again later.'
+						: response.status === 404
+							? 'GitHub account not found.'
+							: 'GitHub could not be loaded.',
 			)
 		const value = await read(response)
 		if (!controller.signal.aborted) {

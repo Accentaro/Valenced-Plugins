@@ -285,14 +285,19 @@ export default function ReposSheet({ login }: { login: string }) {
 							})}
 						>
 							<Design.Card
-								style={{ height: 112 * fontScale, padding: 10, gap: 6 }}
+								style={{
+									height: 112 * fontScale,
+									padding: 10,
+									gap: 6,
+									overflow: 'hidden',
+								}}
 							>
 								<View
 									style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
 								>
 									<Design.Text
 										variant="text-md/semibold"
-										numberOfLines={2}
+										numberOfLines={1}
 										style={{ flex: 1 }}
 									>
 										{item.name}

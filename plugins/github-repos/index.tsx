@@ -3,9 +3,17 @@ import { Design } from '@valenced/discord/design'
 import { getModuleWithImportedPath } from '@valenced/discord/utils/modules/finders'
 import { after } from '@valenced/patcher'
 import { Children, cloneElement, isValidElement, useEffect } from 'react'
-import { clearData, getCalendar, getRepositories, validLogin } from './data'
+import {
+	clearData,
+	getCalendar,
+	getRepositories,
+	setToken,
+	validLogin,
+} from './data'
 import { closeRepos, openRepos } from './ReposSheet'
+import SettingsComponent from './Settings'
 import type { ReactNode } from 'react'
+import type { Settings } from './Settings'
 
 interface ConnectionProps {
 	account?: { type?: string; name?: string }
@@ -45,11 +53,16 @@ function GithubConnection({ login }: { login: string }) {
 	)
 }
 
-export default plugin({
-	start({ cleanup, plugin }) {
+export default plugin<{ jsonStorage: Settings }>({
+	jsonStorage: { load: true, default: {} },
+	SettingsComponent,
+	start({ cleanup, plugin, jsonStorage }) {
 		if (plugin.startedLate) plugin.requireReload()
+		cleanup(jsonStorage.subscribe(() => setToken(jsonStorage.cache?.token)))
+		setToken(jsonStorage.cache?.token)
 		cleanup(() => {
 			closeRepos()
+			setToken(undefined)
 			clearData()
 		})
 		cleanup(
