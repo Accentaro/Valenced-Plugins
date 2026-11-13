@@ -514,6 +514,7 @@ export function Frame({
 				{category.gifs.length && Results ? (
 					<Results
 						{...picker}
+						inActionSheet
 						columns={selected.columns}
 						columnWidth={header.props.columnWidth}
 						resultItems={category.gifs.map(preview)}
