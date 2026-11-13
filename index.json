@@ -757,13 +757,26 @@
       "author": "Benjii <463702169443368970>",
       "icon": "GifIcon",
       "channels": {
-        "latest": "0.0.9"
+        "latest": "0.1.1"
       },
       "versions": {
         "0.0.9": {
           "url": "https://plugins.benjiisworld.com/pool/dev.benjii.gif-categories@0.0.9.zip",
           "sha256": "e8e3270d2cc4004256d37f491624c44ab531a58951b7f184c8714f80a57cce1e",
           "size": 24432,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        },
+        "0.1.1": {
+          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.gif-categories@0.1.1.zip",
+          "sha256": "528ad33ce7b298023a7b3dd14df49f5b8cc95750f8ba1bff8682daad5b358beb",
+          "size": 24441,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
