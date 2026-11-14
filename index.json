@@ -352,7 +352,7 @@
       "description": "Pure black for OLED screens, with hairline borders and quiet silver accents.",
       "author": "Benjii <463702169443368970>",
       "channels": {
-        "latest": "1.1.2"
+        "latest": "1.1.3"
       },
       "versions": {
         "1.1.0": {
@@ -391,6 +391,22 @@
           "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.obsidian@1.1.2.zip",
           "sha256": "d6dd95c43140b0a5af3eb37a9d8027b5f717f54417f51d0c139bcea5c18eef85",
           "size": 26850,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
+        },
+        "1.1.3": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.obsidian@1.1.3.zip",
+          "sha256": "3617afc621cc4b187ff3e55a6680da199dca18d5f2369f70486c3148aaf08d42",
+          "size": 26877,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
