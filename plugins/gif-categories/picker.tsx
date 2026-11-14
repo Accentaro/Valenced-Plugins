@@ -541,13 +541,19 @@ export function Frame({
 					select: id => setSelected({ id, columns: page!.props.columns }),
 				},
 			})
-		return cloneElement(node, {}, Children.map(node.props.children, replace))
+		return withChildren(node)
 	}
-	return cloneElement(
-		original,
-		{},
-		Children.map(original.props.children, replace),
-	)
+	// Children.map re-keys children. Typing a search leaves this page for
+	// Discord's own tree, so changed keys would remount the search input.
+	function withChildren(node: ReactElement<Tree>) {
+		const { children } = node.props
+		return cloneElement(node, {
+			children: Array.isArray(children)
+				? children.map(replace)
+				: replace(children),
+		})
+	}
+	return withChildren(original)
 }
 
 export function GifAction({ gif }: { gif: Gif }) {
