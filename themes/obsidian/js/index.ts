@@ -156,6 +156,13 @@ const light: Look = {
 	},
 }
 
+const colors = lazyColors(tone, {
+	dark,
+	darker: dark,
+	midnight: dark,
+	light,
+})
+
 export default plugin({
 	preInit({ themes }) {
 		themes.registerGroup('obsidian', {
@@ -166,12 +173,12 @@ export default plugin({
 			name: 'Obsidian',
 			description:
 				'True black on every surface for OLED screens, or crisp white on Light.',
-			getColors: lazyColors(tone, {
-				dark,
-				darker: dark,
-				midnight: dark,
-				light,
-			}),
+			getColors: discord => {
+				const result = colors(discord)
+				// The message quote bar reads raw NEUTRAL_65, which the tone turns black.
+				result.raw!.NEUTRAL_65 = black.subtle
+				return result
+			},
 		})
 	},
 })
