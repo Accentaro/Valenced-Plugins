@@ -175,8 +175,10 @@ export default plugin({
 				'True black on every surface for OLED screens, or crisp white on Light.',
 			getColors: discord => {
 				const result = colors(discord)
-				// The message quote bar reads raw NEUTRAL_65, which the tone turns black.
-				result.raw!.NEUTRAL_65 = black.subtle
+				// The message quote bar reads a raw grey per base (Ash 47, Dark 55, Onyx 65),
+				// which the tone turns black.
+				for (const key of ['NEUTRAL_47', 'NEUTRAL_55', 'NEUTRAL_65'])
+					result.raw![key] = black.subtle
 				return result
 			},
 		})
