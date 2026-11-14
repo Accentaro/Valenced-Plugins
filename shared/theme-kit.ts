@@ -190,6 +190,20 @@ export function mix(a: string, b: string, t: number) {
 	return hex([0, 1, 2].map(i => x[i]! + (y[i]! - x[i]!) * t) as Lab)
 }
 
+/** A `#RRGGBBAA` colour laid over an opaque `#RRGGBB`, flattened to one opaque colour. */
+export function over(top: string, bottom: string) {
+	if (top.length !== 9) return top
+	const alpha = Number.parseInt(top.slice(7), 16) / 255
+	const a = parse(top)
+	const b = parse(bottom)
+	let out = '#'
+	for (let i = 0; i < 3; i++)
+		out += Math.round((a[i]! * alpha + b[i]! * (1 - alpha)) * 255)
+			.toString(16)
+			.padStart(2, '0')
+	return out
+}
+
 /** Builds a raw palette mapper for a {@link Tone}. Results are cached per Discord colour. */
 export function toneMapper(tone: Tone) {
 	const greys = tone.greys.map(([from, to]) => [lab(from)[0], lab(to)] as const)
@@ -397,8 +411,9 @@ export function paint(p: Palette): Record<string, string> {
 		MOBILE_FLOATING_ACCESSORY_BORDER: p.border,
 		MOBILE_COMMAND_BAR_DIVIDER: p.divider,
 		STANDALONE_CHANNEL_HEADER_BORDER: p.divider,
-		SPINE_DEFAULT: p.borderStrong,
-		THREAD_CHANNEL_SPINE: p.borderStrong,
+		// Thread pipes are drawn in overlapping pieces, so a translucent colour doubles up at each joint.
+		SPINE_DEFAULT: over(p.borderStrong, p.panel),
+		THREAD_CHANNEL_SPINE: over(p.borderStrong, p.panel),
 		SLIDER_TRACK_BACKGROUND: p.borderStrong,
 
 		// Chat box and inputs.
