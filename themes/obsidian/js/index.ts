@@ -137,7 +137,11 @@ const white: Palette = {
 const dark: Look = {
 	palette: black,
 	extra: {
-		// A grey edge keeps white primary buttons crisp against black.
+		// Primary buttons are black with a grey edge. Discord draws some of their icons
+		// (Edit Profile, Launch Quest, Redeem) in WHITE, so a light fill hides them.
+		CONTROL_PRIMARY_BACKGROUND_DEFAULT: black.page,
+		CONTROL_PRIMARY_BACKGROUND_ACTIVE: black.pressed,
+		CONTROL_PRIMARY_TEXT_DEFAULT: black.heading,
 		CONTROL_PRIMARY_BORDER_DEFAULT: '#ffffff33',
 		MOBILE_BACKGROUND_SCRIM_OPAQUE: '#000000',
 		BACKGROUND_SCRIM_LIGHTBOX: '#000000f2',
