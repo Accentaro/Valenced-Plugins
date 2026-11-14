@@ -352,7 +352,7 @@
       "description": "Pure black for OLED screens, with hairline borders and quiet silver accents.",
       "author": "Benjii <463702169443368970>",
       "channels": {
-        "latest": "1.1.1"
+        "latest": "1.1.2"
       },
       "versions": {
         "1.1.0": {
@@ -375,6 +375,22 @@
           "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.obsidian@1.1.1.zip",
           "sha256": "bca16f2b11230299991efb018977f284fe0c0dbc7deb49ad98e57cbe15cf42b9",
           "size": 26812,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
+        },
+        "1.1.2": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.obsidian@1.1.2.zip",
+          "sha256": "d6dd95c43140b0a5af3eb37a9d8027b5f717f54417f51d0c139bcea5c18eef85",
+          "size": 26850,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
@@ -757,7 +773,7 @@
       "author": "Benjii <463702169443368970>",
       "icon": "GifIcon",
       "channels": {
-        "latest": "0.1.1"
+        "latest": "0.1.2"
       },
       "versions": {
         "0.0.9": {
@@ -777,6 +793,19 @@
           "url": "https://plugins.benjiisworld.com/pool/dev.benjii.gif-categories@0.1.1.zip",
           "sha256": "528ad33ce7b298023a7b3dd14df49f5b8cc95750f8ba1bff8682daad5b358beb",
           "size": 24441,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        },
+        "0.1.2": {
+          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.gif-categories@0.1.2.zip",
+          "sha256": "7268d6a963b3ea816e9f1be97044294b63ca6e77e10b54d172e4e8e125cad468",
+          "size": 24470,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
@@ -925,7 +954,7 @@
       "author": "Benjii <463702169443368970>",
       "icon": "QuoteIcon",
       "channels": {
-        "latest": "1.0.3"
+        "latest": "1.0.4"
       },
       "versions": {
         "1.0.0": {
@@ -958,6 +987,19 @@
           "url": "https://plugins.benjiisworld.com/pool/dev.benjii.quoter@1.0.3.zip",
           "sha256": "bd3bd4e1ebc3f098b30d7f9f014640bddc731e8e5d01c3b99329b50d8d3c055b",
           "size": 37096,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        },
+        "1.0.4": {
+          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.quoter@1.0.4.zip",
+          "sha256": "aeb956e2211d54d2357f3779f67d94e3e84d14139a58b6e06fb1f595cc210ece",
+          "size": 38383,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
