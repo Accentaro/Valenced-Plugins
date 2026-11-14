@@ -52,6 +52,24 @@ export function getQuoteMedia(message: QuoteMessage): QuoteMedia[] {
 	return media
 }
 
+// Stickers are part of the message, so they don't depend on Allow media.
+// Lottie stickers (format 3) are animation JSON, drawn by lottie-web.
+export function getQuoteStickers(message: QuoteMessage): QuoteMedia[] {
+	return (message.stickerItems ?? message.sticker_items ?? [])
+		.filter(sticker => /^\d+$/.test(sticker.id))
+		.map(sticker =>
+			sticker.format_type === 3
+				? {
+						url: `https://media.discordapp.net/stickers/${sticker.id}.json`,
+						kind: 'lottie',
+					}
+				: {
+						url: `https://media.discordapp.net/stickers/${sticker.id}.${sticker.format_type === 4 ? 'gif' : 'png'}?size=320`,
+						kind: 'image',
+					},
+		)
+}
+
 export function getEmbeddedReply(
 	message: QuoteMessage,
 ): QuoteMessage | undefined {

@@ -20,7 +20,7 @@ export interface QuoteAuthor {
 }
 export interface QuoteMedia {
 	url: string
-	kind: 'image' | 'video'
+	kind: 'image' | 'video' | 'lottie'
 }
 export interface MessageAttachment {
 	url?: string
@@ -39,12 +39,18 @@ export interface MessageEmbed {
 	thumbnail?: MessageAttachment
 	video?: MessageAttachment
 }
+export interface StickerItem {
+	id: string
+	format_type?: number
+}
 export interface QuoteMessage {
 	id?: string
 	nick?: string
 	colorString?: string
 	attachments?: MessageAttachment[]
 	embeds?: MessageEmbed[]
+	stickerItems?: StickerItem[]
+	sticker_items?: StickerItem[]
 	referenced_message?: QuoteMessage | null
 	referencedMessage?: { message?: QuoteMessage } | QuoteMessage
 	messageReference?: {

@@ -5,6 +5,7 @@ import {
 	getEmbeddedReply,
 	getQuoteContent,
 	getQuoteMedia,
+	getQuoteStickers,
 	quoteText,
 } from './content'
 import type {
@@ -44,6 +45,7 @@ const SPACING = {
 
 export interface QuotePayload {
 	media: QuoteMedia[]
+	emojis: string[]
 	reply?: {
 		media: QuoteMedia[]
 		text: string
@@ -100,8 +102,20 @@ function sizeUpgrade(url: string): string {
 	}
 }
 
-export function fixUpQuote(rawQuote: unknown): string {
-	let result = String(rawQuote ?? '').replace(/<a?:(\w+):(\d+)>/g, '')
+// Custom emojis become private-use characters that the renderer draws as
+// images from payload.emojis. Without a list they're removed.
+export const EMOJI_BASE = 0xe000
+
+export function fixUpQuote(rawQuote: unknown, emojis?: string[]): string {
+	let result = String(rawQuote ?? '').replace(
+		/<a?:\w+:(\d+)>/g,
+		(_, id: string) => {
+			if (!emojis) return ''
+			let index = emojis.indexOf(id)
+			if (index < 0) index = emojis.push(id) - 1
+			return String.fromCharCode(EMOJI_BASE + index)
+		},
+	)
 	const mentionMatches = result.match(/<@!?\d+>/g)
 	if (!mentionMatches) return normalizeText(result)
 
@@ -248,18 +262,26 @@ export function buildPayload(
 	const reply =
 		options.allowReplies && includeReply ? getReply(message) : undefined
 	const replyAuthor = reply && getMessageAuthor(reply)
-	const replyMedia = reply && options.allowMedia ? getQuoteMedia(reply) : []
-	const media = options.allowMedia ? getQuoteMedia(message) : []
-	const text = fixUpQuote(getQuoteContent(message, media))
+	const replyMedia = reply
+		? [
+				...getQuoteStickers(reply),
+				...(options.allowMedia ? getQuoteMedia(reply) : []),
+			]
+		: []
+	const attachments = options.allowMedia ? getQuoteMedia(message) : []
+	const media = [...getQuoteStickers(message), ...attachments]
+	const emojis: string[] = []
+	const text = fixUpQuote(getQuoteContent(message, attachments), emojis)
 	return {
 		media,
+		emojis,
 		reply:
 			reply && replyAuthor
 				? {
 						media: replyMedia,
 						timestamp: formatTimestamp(reply),
 						text:
-							fixUpQuote(getQuoteContent(reply, replyMedia)) ||
+							fixUpQuote(getQuoteContent(reply, replyMedia), emojis) ||
 							(replyMedia.length
 								? ''
 								: getQuoteMedia(reply).length

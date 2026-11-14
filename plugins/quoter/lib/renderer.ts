@@ -1,6 +1,11 @@
 import { gifEncoderSource } from './gif-encoder'
 import { mediaRendererSource } from './media-renderer'
+import { EMOJI_BASE } from './quote'
 import type { QuotePayload } from './quote'
+
+// Only loaded for Lottie stickers, which are animation JSON rather than images.
+const LOTTIE_URL =
+	'https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie_canvas.min.js'
 
 /**
  * Builds the HTML document rendered inside a hidden WebView. It draws the
@@ -16,10 +21,15 @@ export function buildRendererHtml(payload: QuotePayload): string {
 		'<\\/script',
 	)
 
+	const lottie = [...payload.media, ...(payload.reply?.media ?? [])].some(
+		item => item.kind === 'lottie',
+	)
+
 	return `<!doctype html>
 <html>
 <head>
 <meta charset="utf-8" />
+${lottie ? `<script src="${LOTTIE_URL}"></script>` : ''}
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
 ${payload.reply ? "@font-face { font-family: 'gg sans'; font-weight: 400; src: url('file:///android_asset/fonts/ggsans-Normal.ttf'); } @font-face { font-family: 'gg sans'; font-weight: 600; src: url('file:///android_asset/fonts/ggsans-Semibold.ttf'); }" : "@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@300&display=swap');"}
@@ -42,6 +52,8 @@ canvas {
 <canvas id="q" width="1200" height="600"></canvas>
 <script>
 const payload = ${safePayload};
+// Media frames are cleared to this, so transparent stickers match the card.
+const mediaBackground = payload.reply ? "#1c1d22" : "#000";
 ${payload.media?.length || payload.reply?.media?.length ? `${gifEncoderSource}\n${mediaRendererSource}` : ''}
 
 function post(data) {
@@ -63,6 +75,50 @@ async function waitForFonts(font) {
     } catch {}
 }
 
+// Custom emojis arrive as private-use characters indexing payload.emojis.
+let emojiImages = [];
+function emojiIndex(unit) {
+    const index = unit.length === 1 ? unit.charCodeAt(0) - ${EMOJI_BASE} : -1;
+    return index >= 0 && index < emojiImages.length ? index : -1;
+}
+function emojiSize(ctx) {
+    return parseFloat(/([\\d.]+)px/.exec(ctx.font)[1]) * 1.2;
+}
+function measure(ctx, text) {
+    let width = 0, plain = "";
+    for (const unit of text) {
+        if (emojiIndex(unit) < 0) plain += unit;
+        else width += emojiSize(ctx);
+    }
+    return width + (plain ? ctx.measureText(plain).width : 0);
+}
+function drawLine(ctx, line, x, y, maxWidth) {
+    if (!Array.from(line).some(unit => emojiIndex(unit) >= 0)) return ctx.fillText(line, x, y, maxWidth);
+    const width = measure(ctx, line);
+    const scale = Math.min(1, maxWidth / width);
+    const size = emojiSize(ctx) * scale;
+    const align = ctx.textAlign;
+    let left = align === "center" ? x - width * scale / 2 : x;
+    ctx.textAlign = "left";
+    let text = "";
+    const flush = () => {
+        if (!text) return;
+        const textWidth = ctx.measureText(text).width * scale;
+        ctx.fillText(text, left, y, textWidth);
+        left += textWidth;
+        text = "";
+    };
+    for (const unit of line) {
+        const index = emojiIndex(unit);
+        if (index < 0) { text += unit; continue; }
+        flush();
+        if (emojiImages[index]) ctx.drawImage(emojiImages[index], left, y - size * 0.1, size, size);
+        left += size;
+    }
+    flush();
+    ctx.textAlign = align;
+}
+
 function calculateTextLines(ctx, text, fontSize, font, maxWidth, firstWidth = maxWidth) {
     ctx.font = "300 " + fontSize + "px '" + font + "', sans-serif";
     const lines = [];
@@ -71,11 +127,11 @@ function calculateTextLines(ctx, text, fontSize, font, maxWidth, firstWidth = ma
         let line = "";
         for (const word of paragraph.split(/\\s+/).filter(Boolean)) {
             const candidate = line ? line + " " + word : word;
-            if (ctx.measureText(candidate).width <= (lines.length ? maxWidth : firstWidth)) { line = candidate; continue; }
+            if (measure(ctx, candidate) <= (lines.length ? maxWidth : firstWidth)) { line = candidate; continue; }
             if (line) { lines.push(line); line = ""; }
             const units = segmenter ? Array.from(segmenter.segment(word), part => part.segment) : Array.from(word);
             for (const unit of units) {
-                if (line && ctx.measureText(line + unit).width > (lines.length ? maxWidth : firstWidth)) { lines.push(line); line = ""; }
+                if (line && measure(ctx, line + unit) > (lines.length ? maxWidth : firstWidth)) { lines.push(line); line = ""; }
                 line += unit;
             }
         }
@@ -142,6 +198,7 @@ async function render() {
     for (const result of loaded) if (result.status === 'fulfilled') media.push(result.value);
     const failure = loaded.find(result => result.status === 'rejected');
     if (failure) throw failure.reason;
+    emojiImages = await Promise.all((payload.emojis || []).map(id => loadAvatar("https://cdn.discordapp.com/emojis/" + id + ".png?size=96").catch(() => null)));
     const cfg = payload.reply ? { ...payload.canvas, width: 1200 } : payload.canvas;
     const fs = payload.fonts;
     const sp = payload.spacing;
@@ -161,12 +218,12 @@ async function render() {
     let blockWidth = areaWidth;
     if (reply) {
         ctx.font = "400 32px 'gg sans', sans-serif";
-        const bodyWidth = Math.max(...quote.split('\\n').map(line => ctx.measureText(line).width)) + 108;
+        const bodyWidth = Math.max(...quote.split('\\n').map(line => measure(ctx, line))) + 108;
         ctx.font = "600 24px 'gg sans', sans-serif";
         const referenceNameWidth = ctx.measureText(reply.displayName).width;
         ctx.font = "400 24px 'gg sans', sans-serif";
         const referenceHeaderWidth = referenceNameWidth + 158 + (reply.timestamp ? ctx.measureText(reply.timestamp).width + 18 : 0);
-        const referenceWidth = referenceHeaderWidth + Math.max(...reply.text.split('\\n').map(line => ctx.measureText(line).width));
+        const referenceWidth = referenceHeaderWidth + Math.max(...reply.text.split('\\n').map(line => measure(ctx, line)));
         ctx.font = "600 30px 'gg sans', sans-serif";
         const headerWidth = ctx.measureText(payload.displayName).width + 108 + (payload.isBot ? 190 : 120);
         blockWidth = Math.max(headerWidth, referenceHeaderWidth + 120, Math.min(areaWidth, Math.max(bodyWidth, referenceWidth)));
@@ -201,7 +258,7 @@ async function render() {
     canvas.height = height;
 
     if (payload.grayscale) ctx.filter = "grayscale(1)";
-    ctx.fillStyle = reply ? "#1c1d22" : "#000";
+    ctx.fillStyle = mediaBackground;
     ctx.fillRect(0, 0, cfg.width, height);
 
     if (!reply) {
@@ -243,7 +300,7 @@ async function render() {
         ctx.font = "400 24px 'gg sans', sans-serif";
         if (reply.timestamp) ctx.fillText(reply.timestamp, x + 158 + replyNameWidth, quoteY, replyTimestampWidth - 18);
         ctx.fillStyle = '#b5bac1';
-        replyLines.forEach((line, index) => ctx.fillText(line, index ? x + 108 : x + 158 + replyNameWidth + replyTimestampWidth, quoteY + index * 30, index ? contentWidth : replyFirstWidth));
+        replyLines.forEach((line, index) => drawLine(ctx, line, index ? x + 108 : x + 158 + replyNameWidth + replyTimestampWidth, quoteY + index * 30, index ? contentWidth : replyFirstWidth));
         let replyMediaY = quoteY + replyLines.length * 30 + 12;
         for (const rect of replyRectangles) {
             rect.x = Math.round(x + 108);
@@ -272,7 +329,7 @@ async function render() {
         ctx.font = "400 32px 'gg sans', sans-serif";
     }
     for (const line of messageLines) {
-        ctx.fillText(line, reply ? blockX + 108 : centerX, quoteY, contentWidth);
+        drawLine(ctx, line, reply ? blockX + 108 : centerX, quoteY, contentWidth);
         quoteY += reply ? 42 : calculation.lineHeight;
     }
     for (const rect of messageRectangles) {

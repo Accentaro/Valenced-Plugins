@@ -90,7 +90,8 @@ function QuoteAlert({
 		ready: boolean
 	}>()
 	const [error, setError] = useState('')
-	const includeReply = settings.allowReplies && !!getReply(message)
+	const hasReply = useMemo(() => !!getReply(message), [message])
+	const includeReply = settings.allowReplies && hasReply
 	const [draft, setDraft] = useState(settings.watermark)
 	useEffect(() => {
 		if (draft === settings.watermark) return
@@ -267,6 +268,15 @@ function QuoteAlert({
 							settings.updateSettings({ quotationMarks })
 						}
 					/>
+					{hasReply && (
+						<Design.TableSwitchRow
+							label="Include reply"
+							value={settings.allowReplies}
+							onValueChange={(allowReplies: boolean) =>
+								settings.updateSettings({ allowReplies })
+							}
+						/>
+					)}
 					<Design.TableSwitchRow
 						label="Grayscale"
 						value={settings.grayscale}

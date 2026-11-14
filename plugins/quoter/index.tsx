@@ -4,7 +4,7 @@ import { withName } from '@valenced/modules/finders/filters'
 import { instead } from '@valenced/patcher'
 import { lookupGeneratedIconComponent } from '@valenced/utils/discord'
 import { Children, cloneElement, isValidElement } from 'react'
-import { getQuoteMedia } from './lib/content'
+import { getQuoteMedia, getQuoteStickers } from './lib/content'
 import { closeQuoteModal, openQuoteModal } from './preview'
 import Settings from './settings'
 import {
@@ -51,6 +51,7 @@ export default plugin<{ jsonStorage: QuoterSettings }>({
 							if (
 								!message ||
 								(!message.content &&
+									!getQuoteStickers(message).length &&
 									!(quoterSettings.allowMedia && getQuoteMedia(message).length))
 							)
 								return result

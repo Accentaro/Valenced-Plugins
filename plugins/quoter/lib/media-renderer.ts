@@ -29,6 +29,32 @@ function mediaEvent(target, event, action) {
 }
 async function loadMedia(item) {
     const blob = await fetchMedia(item.url);
+    if (item.kind === 'lottie') {
+        if (typeof lottie === 'undefined') throw new Error("Could not load the sticker player.");
+        const data = JSON.parse(await blob.text());
+        const canvas = document.createElement('canvas');
+        canvas.width = data.w;
+        canvas.height = data.h;
+        const animation = lottie.loadAnimation({
+            renderer: 'canvas', loop: false, autoplay: false, animationData: data,
+            rendererSettings: { context: canvas.getContext('2d'), clearCanvas: true },
+        });
+        const frameMs = 1000 / (data.fr || 30);
+        const frames = Math.max(1, data.op - data.ip);
+        const duration = frames * frameMs;
+        if (duration > 30000) { animation.destroy(); throw new Error("Animated quotes support clips up to 30 seconds."); }
+        // GIF delays are in 10 ms steps, so frames closer than 40 ms aren't worth encoding.
+        const step = Math.max(frameMs, 40);
+        return {
+            width: canvas.width, height: canvas.height, duration,
+            boundaries: Array.from({ length: Math.ceil(duration / step) }, (_, i) => i * step),
+            async frameAt(time) {
+                animation.goToAndStop((time % duration) / frameMs, true);
+                return { image: canvas, close() {} };
+            },
+            close() { animation.destroy(); },
+        };
+    }
     if (item.kind === 'video') {
         const url = URL.createObjectURL(blob);
         const video = document.createElement('video');
@@ -124,7 +150,7 @@ async function exportMedia(canvas, media, rectangles, renderId) {
             const frame = await item.frameAt(0);
             const rect = rectangles[m];
             try {
-                ctx.fillStyle = '#000';
+                ctx.fillStyle = mediaBackground;
                 ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
                 ctx.drawImage(frame.image, rect.x, rect.y, rect.width, rect.height);
             } finally { frame.close(); }
@@ -147,7 +173,7 @@ async function exportMedia(canvas, media, rectangles, renderId) {
                     if (!item.duration && index) return;
                     const frame = await item.frameAt(time);
                     try {
-                        sampleContext.fillStyle = '#000';
+                        sampleContext.fillStyle = mediaBackground;
                         sampleContext.fillRect(0, 0, 32, 32);
                         sampleContext.drawImage(frame.image, 0, 0, 32, 32);
                         chunks.push(sampleContext.getImageData(0, 0, 32, 32).data);
@@ -176,7 +202,7 @@ async function exportMedia(canvas, media, rectangles, renderId) {
             const rect = rectangles[m];
             const frame = await item.frameAt(item.boundaries[frameIndex]);
             try {
-                ctx.fillStyle = '#000';
+                ctx.fillStyle = mediaBackground;
                 ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
                 ctx.drawImage(frame.image, rect.x, rect.y, rect.width, rect.height);
             } finally { frame.close(); }
