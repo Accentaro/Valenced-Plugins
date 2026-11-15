@@ -1136,6 +1136,30 @@
         }
       }
     },
+    "dev.benjii.screenshot-scrambler": {
+      "name": "Screenshot Scrambler",
+      "description": "A floating button that scrambles names, messages and other private text so you can take a safe screenshot.",
+      "author": "Benjii <463702169443368970>",
+      "icon": "EyeSlashIcon",
+      "channels": {
+        "latest": "1.0.0"
+      },
+      "versions": {
+        "1.0.0": {
+          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.screenshot-scrambler@1.0.0.zip",
+          "sha256": "48be66467f188a463a788835b9b82275b7062c5925ff8d1c230a92d564c619a7",
+          "size": 23612,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        }
+      }
+    },
     "dev.benjii.server-drawer": {
       "name": "Server Drawer",
       "description": "A compact server dock with a searchable server and DM drawer, folders, and drag and drop.",
