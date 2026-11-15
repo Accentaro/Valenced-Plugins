@@ -939,7 +939,7 @@
       ],
       "icon": "GifIcon",
       "channels": {
-        "latest": "1.0.1"
+        "latest": "1.0.2"
       },
       "versions": {
         "1.0.0": {
@@ -959,6 +959,19 @@
           "url": "https://plugins.benjiisworld.com/pool/dev.benjii.gif-providers@1.0.1.zip",
           "sha256": "daab61bd805baf4af76e91ec4c7c60db6db6358c70608bc103df8c32736d4020",
           "size": 22472,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        },
+        "1.0.2": {
+          "url": "https://plugins.benjiisworld.com/pool/dev.benjii.gif-providers@1.0.2.zip",
+          "sha256": "cf71f94cd174866e9cf006eebfb10bf05b9ea39bebb6b088dc7cd79a6edfcc1e",
+          "size": 22485,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
