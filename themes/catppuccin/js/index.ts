@@ -1,5 +1,6 @@
 /// <reference types="@valenced/themes-api" />
 
+import { themeOwnProfile } from '../../../shared/own-profile-theme'
 import { mix, themeColors } from '../../../shared/theme-kit'
 import Settings from './settings'
 import type { JsonStorage } from '@valenced/json-storage'
@@ -394,6 +395,8 @@ export default plugin<{ jsonStorage: CatppuccinStorage }>({
 		storage = jsonStorage
 	},
 	// Valenced only opens the settings page of started plugins.
-	start() {},
+	start(api) {
+		themeOwnProfile(api as never)
+	},
 	SettingsComponent: Settings,
 })

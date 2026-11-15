@@ -1,5 +1,6 @@
 /// <reference types="@valenced/themes-api" />
 
+import { themeOwnProfile } from '../../../shared/own-profile-theme'
 import { lazyColors } from '../../../shared/theme-kit'
 import type { Look, Palette, Tone } from '../../../shared/theme-kit'
 
@@ -164,6 +165,7 @@ const colors = lazyColors(tone, {
 })
 
 export default plugin({
+	start: themeOwnProfile,
 	preInit({ themes }) {
 		themes.registerGroup('obsidian', {
 			name: 'Obsidian',

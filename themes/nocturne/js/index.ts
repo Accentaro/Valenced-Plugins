@@ -1,6 +1,7 @@
 /// <reference types="@valenced/themes-api" />
 
 import { fixChatBackground } from '../../../shared/chat-background'
+import { themeOwnProfile } from '../../../shared/own-profile-theme'
 import { lazyColors } from '../../../shared/theme-kit'
 import type { Look, Palette, Tone } from '../../../shared/theme-kit'
 
@@ -163,7 +164,10 @@ const light: Look = {
 }
 
 export default plugin({
-	start: fixChatBackground,
+	start(api) {
+		fixChatBackground(api)
+		themeOwnProfile(api)
+	},
 	preInit({ themes }) {
 		themes.registerGroup('nocturne', {
 			name: 'Nocturne',
