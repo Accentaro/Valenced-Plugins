@@ -9,6 +9,7 @@ import {
 	callNativeMethodSync,
 } from '@valenced/modules/native'
 import { reloadApp } from '@valenced/modules/native/app'
+import { OwnProfileSwitch } from './own-profile-setting'
 import type { JsonStorage } from '@valenced/json-storage'
 import type { PluginSettingsComponent } from '@valenced/plugins/types'
 import type {
@@ -17,6 +18,7 @@ import type {
 	ThemesState,
 } from '@valenced/themes-api/types'
 import type { ComponentProps } from 'react'
+import type { OwnProfileStorage } from './own-profile-theme'
 
 declare module '@valenced/modules/native' {
 	export interface NativeMethods {
@@ -28,7 +30,7 @@ declare module '@valenced/modules/native' {
 	}
 }
 
-export interface AccentStorage<A extends string> {
+export interface AccentStorage<A extends string> extends OwnProfileStorage {
 	accent: A
 	/** Discord's raw palette, kept so accent changes can re-apply the theme. */
 	raw?: Record<string, string>
@@ -110,6 +112,7 @@ export function accentTheme<A extends string>(options: AccentThemeOptions<A>) {
 						/>
 					</TableRowGroup>
 				) : null}
+				<OwnProfileSwitch storage={store} />
 				<TableRadioGroup title="Accent" value={accent} onChange={pick}>
 					{accents.map(a => (
 						<TableRadioRow

@@ -4,6 +4,7 @@ import {
 	callNativeMethodSync,
 } from '@valenced/modules/native'
 import { reloadApp } from '@valenced/modules/native/app'
+import { OwnProfileSwitch } from '../../../shared/own-profile-setting'
 import { accents, colorsOf, flavourIds, mocha } from '.'
 import type { PluginSettingsComponent } from '@valenced/plugins/types'
 import type { ColorsSelection, ThemesState } from '@valenced/themes-api/types'
@@ -83,6 +84,7 @@ export default function Settings({ api }: Props) {
 					/>
 				</TableRowGroup>
 			) : null}
+			<OwnProfileSwitch storage={storage} />
 			<TableRadioGroup title="Accent" value={accent} onChange={pick}>
 				{accents.map(a => (
 					<TableRadioRow

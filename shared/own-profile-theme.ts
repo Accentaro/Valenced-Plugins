@@ -27,6 +27,12 @@ interface RootThemeContextModule {
 
 type ProfileColors = [number, number]
 
+/** The theme plugin's JSON storage fields this reads. */
+export interface OwnProfileStorage {
+	/** Show the theme on your own You page instead of your profile theme. On unless turned off. */
+	themeOwnProfile?: boolean
+}
+
 const onYouScreenKey = Symbol.for('benjii.dev.theme.onYouScreen')
 
 /**
@@ -40,6 +46,10 @@ const onYouScreenKey = Symbol.for('benjii.dev.theme.onYouScreen')
  */
 export function themeOwnProfile(api: PluginApi) {
 	const { cleanup, plugin, unscoped } = api
+	// Themes without the setting have no JSON storage, and always theme the profile.
+	const storage = (
+		api as { jsonStorage?: { cache?: OwnProfileStorage | null } }
+	).jsonStorage
 	const { modules, patcher, react, discord } = unscoped
 	const { native, finders } = modules
 	const { withName, withProps } = finders.filters
@@ -85,7 +95,11 @@ export function themeOwnProfile(api: PluginApi) {
 
 	/** This theme's colours when `profile` is yours and is rendering inside the You screen. */
 	function override(profile: DisplayProfile): ProfileColors | null {
-		if (!enabled || profile.userId !== UserStore.getCurrentUser()?.id)
+		if (
+			!enabled ||
+			storage?.cache?.themeOwnProfile === false ||
+			profile.userId !== UserStore.getCurrentUser()?.id
+		)
 			return null
 		try {
 			// `use` may be called conditionally; outside a render it throws.

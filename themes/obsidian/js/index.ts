@@ -1,6 +1,8 @@
 /// <reference types="@valenced/themes-api" />
 
+import { OwnProfileSettings } from '../../../shared/own-profile-setting'
 import { themeOwnProfile } from '../../../shared/own-profile-theme'
+import type { OwnProfileStorage } from '../../../shared/own-profile-theme'
 import { lazyColors } from '../../../shared/theme-kit'
 import type { Look, Palette, Tone } from '../../../shared/theme-kit'
 
@@ -164,8 +166,12 @@ const colors = lazyColors(tone, {
 	light,
 })
 
-export default plugin({
-	start: themeOwnProfile,
+export default plugin<{ jsonStorage: OwnProfileStorage }>({
+	jsonStorage: { load: true, default: {} },
+	SettingsComponent: OwnProfileSettings,
+	start(api) {
+		themeOwnProfile(api as never)
+	},
 	preInit({ themes }) {
 		themes.registerGroup('obsidian', {
 			name: 'Obsidian',

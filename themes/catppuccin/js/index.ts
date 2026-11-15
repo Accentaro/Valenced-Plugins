@@ -1,6 +1,7 @@
 /// <reference types="@valenced/themes-api" />
 
 import { themeOwnProfile } from '../../../shared/own-profile-theme'
+import type { OwnProfileStorage } from '../../../shared/own-profile-theme'
 import { mix, themeColors } from '../../../shared/theme-kit'
 import Settings from './settings'
 import type { JsonStorage } from '@valenced/json-storage'
@@ -333,7 +334,7 @@ const flavours = [
 	['latte', 'Latte', latte, 'The light flavour. Mocha on dark appearances.'],
 ] as const
 
-export interface CatppuccinStorage {
+export interface CatppuccinStorage extends OwnProfileStorage {
 	accent: Accent
 	/** Discord's raw palette retained for accent changes. */
 	raw?: Record<string, string>
