@@ -9,7 +9,7 @@ A collection of personally maintained plugins for **[Valenced](https://github.co
 
 [![Valenced](https://img.shields.io/badge/Client-Valenced-5865F2?style=flat-square)](https://github.com/Valenced/valenced)
 [![Plugins](https://img.shields.io/badge/Plugins-9-8B5CF6?style=flat-square)](#plugin-collection)
-[![Themes](https://img.shields.io/badge/Themes-6-EC4899?style=flat-square)](#theme-collection)
+[![Themes](https://img.shields.io/badge/Themes-8-EC4899?style=flat-square)](#theme-collection)
 [![Licences](https://img.shields.io/badge/Licences-MPL--2.0%20%2F%20GPL--3.0-64748B?style=flat-square)](#licences--attribution)
 
 </div>
@@ -189,6 +189,26 @@ Plum night and a coral horizon beneath a ringed planet. A peach dawn on Light.
 
 </td>
 </tr>
+<tr>
+<td valign="top">
+
+### ◈ Tokyo Night
+
+Deep navy and neon over a rainy alley at night, in the Night, Storm and Moon variants with nine accents. Tokyo Night Day on Light.
+
+<sub>**Contributor:** Benjii</sub>
+
+</td>
+<td valign="top">
+
+### ◈ Everforest
+
+Warm forest greens over misty pines, in hard, medium and soft contrast with seven accents. Parchment Everforest Light on Light.
+
+<sub>**Contributor:** Benjii</sub>
+
+</td>
+</tr>
 </table>
 
 ## About this repository
@@ -207,6 +227,8 @@ This is where I keep everything so sometimes things might break. Stable releases
 | Valenced runtime and template code included in this repository | [GPL-3.0](LICENSE) |
 | `gifenc` in Quoter (Matt DesLauriers) | Embedded MIT licence |
 | [Catppuccin](https://github.com/catppuccin/palette) palette in the Catppuccin theme | MIT |
+| [Tokyo Night](https://github.com/folke/tokyonight.nvim) palette in the Tokyo Night theme | Apache-2.0 |
+| [Everforest](https://github.com/sainnhe/everforest) palette in the Everforest theme | MIT |
 | Sakura background, ["Kitchen, Sakura, Sunny"](https://pixabay.com/illustrations/kitchen-sakura-sunny-vibe-tree-8544377/) by Tangereni | Pixabay Content Licence |
 
 You may use, modify and share code under its applicable licence. Retain copyright, licence and attribution notices, and provide source where required. **Credit belongs to the original creators; my modifications do not replace their authorship.**

@@ -1,0 +1,22 @@
+{
+	"format": 1,
+	"id": "benjii.dev.theme.everforest",
+	"name": "Everforest",
+	"description": "Warm forest greens on soft dark or parchment backgrounds, in hard, medium and soft contrast.",
+	"author": "Benjii <463702169443368970>",
+	"version": "1.0.0",
+	"dependencies": {
+		"valenced.api": {
+			"version": ">=1 <2"
+		},
+		"discord": {
+			"version": ">=352.2"
+		},
+		"valenced.api.themes": {
+			"version": ">=1.0.1 <2"
+		}
+	},
+	"dist": {
+		"script": "index.js"
+	}
+}

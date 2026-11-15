@@ -1,0 +1,22 @@
+{
+	"format": 1,
+	"id": "benjii.dev.theme.tokyonight",
+	"name": "Tokyo Night",
+	"description": "Deep navy, electric blue and soft magenta, in the Night, Storm, Moon and Day variants.",
+	"author": "Benjii <463702169443368970>",
+	"version": "1.0.0",
+	"dependencies": {
+		"valenced.api": {
+			"version": ">=1 <2"
+		},
+		"discord": {
+			"version": ">=352.2"
+		},
+		"valenced.api.themes": {
+			"version": ">=1.0.1 <2"
+		}
+	},
+	"dist": {
+		"script": "index.js"
+	}
+}
