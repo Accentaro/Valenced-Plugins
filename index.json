@@ -8,7 +8,7 @@
       "description": "The Catppuccin pastel palette in all four flavours (Latte, Frappé, Macchiato and Mocha), each with all 14 accent colours.",
       "author": "Benjii <463702169443368970>",
       "channels": {
-        "latest": "1.3.1"
+        "latest": "1.3.2"
       },
       "versions": {
         "1.1.0": {
@@ -90,6 +90,22 @@
               "version": ">=1.0.1 <2"
             }
           }
+        },
+        "1.3.2": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.catppuccin@1.3.2.zip",
+          "sha256": "78700302ab8fb772cf7f4e633747d67d72d5f8f0d1da16cb27120ca6e1180f83",
+          "size": 30113,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
         }
       }
     },
@@ -98,7 +114,7 @@
       "description": "Plum and coral, over an anime sunset beneath a ringed planet.",
       "author": "Benjii <463702169443368970>",
       "channels": {
-        "latest": "1.1.6"
+        "latest": "1.1.7"
       },
       "versions": {
         "1.1.0": {
@@ -212,6 +228,22 @@
               "version": ">=1.0.1 <2"
             }
           }
+        },
+        "1.1.7": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.celestia@1.1.7.zip",
+          "sha256": "d0ca95caa8cc661b55ff67991fa82d3e6b8b76c103f4a103794405099b33eec4",
+          "size": 194757,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
         }
       }
     },
@@ -220,13 +252,29 @@
       "description": "Warm forest greens on soft dark or parchment backgrounds, in hard, medium and soft contrast.",
       "author": "Benjii <463702169443368970>",
       "channels": {
-        "latest": "1.0.0"
+        "latest": "1.0.1"
       },
       "versions": {
         "1.0.0": {
           "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.everforest@1.0.0.zip",
           "sha256": "f0cc42c6dabcdf45693d5f1f94e1ecbc18c26524395cf0cdbe72cde016eb3eb2",
           "size": 52104,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
+        },
+        "1.0.1": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.everforest@1.0.1.zip",
+          "sha256": "3dce2c83b46bd13a03556196a2d199916ab9e3e79b66c51c2fb7348b759b46f1",
+          "size": 52284,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
@@ -246,7 +294,7 @@
       "description": "Midnight snowfall: near-black surfaces with frosted white accents, over a falling-snow background.",
       "author": "Benjii <463702169443368970>",
       "channels": {
-        "latest": "1.1.6"
+        "latest": "1.1.7"
       },
       "versions": {
         "1.1.0": {
@@ -360,6 +408,22 @@
               "version": ">=1.0.1 <2"
             }
           }
+        },
+        "1.1.7": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.frostfall@1.1.7.zip",
+          "sha256": "973efd16abd933343aa5cb60006f60afef3ed444018e9d12ce37930854805cd5",
+          "size": 250295,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
         }
       }
     },
@@ -368,7 +432,7 @@
       "description": "Navy and rain-lit cyan, over an anime night of blue rain beneath a crescent moon.",
       "author": "Benjii <463702169443368970>",
       "channels": {
-        "latest": "1.1.6"
+        "latest": "1.1.7"
       },
       "versions": {
         "1.1.0": {
@@ -482,6 +546,22 @@
               "version": ">=1.0.1 <2"
             }
           }
+        },
+        "1.1.7": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.nocturne@1.1.7.zip",
+          "sha256": "619c4f5a69b99946717f37fbca363f298970c73b96c93857e3a7661221dccba0",
+          "size": 134939,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
         }
       }
     },
@@ -490,7 +570,7 @@
       "description": "Pure black for OLED screens, with hairline borders and quiet silver accents.",
       "author": "Benjii <463702169443368970>",
       "channels": {
-        "latest": "1.1.6"
+        "latest": "1.1.7"
       },
       "versions": {
         "1.1.0": {
@@ -604,6 +684,22 @@
               "version": ">=1.0.1 <2"
             }
           }
+        },
+        "1.1.7": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.obsidian@1.1.7.zip",
+          "sha256": "8ca3433ab7c695df82bdfb9b485efe994252e63d0bd2cbcdfd82a6bb1b93f0cd",
+          "size": 28242,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
         }
       }
     },
@@ -612,7 +708,7 @@
       "description": "A cozy, calm anime theme: cream manga paper, ink lines and sakura pastels, with a soft night version.",
       "author": "Benjii <463702169443368970>",
       "channels": {
-        "latest": "1.1.6"
+        "latest": "1.1.7"
       },
       "versions": {
         "1.1.0": {
@@ -726,6 +822,22 @@
               "version": ">=1.0.1 <2"
             }
           }
+        },
+        "1.1.7": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.sakura@1.1.7.zip",
+          "sha256": "b8ada5338960f4fe643937209f6999f81e593e9887fd35bcd7088c025b5ac77b",
+          "size": 357425,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
         }
       }
     },
@@ -734,13 +846,29 @@
       "description": "Deep navy, electric blue and soft magenta, in the Night, Storm, Moon and Day variants.",
       "author": "Benjii <463702169443368970>",
       "channels": {
-        "latest": "1.0.0"
+        "latest": "1.0.1"
       },
       "versions": {
         "1.0.0": {
           "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.tokyonight@1.0.0.zip",
           "sha256": "23382711755c6899e9b171f2406d0908b357206d53096d77b9e477fa6a2d34ed",
           "size": 66303,
+          "dependencies": {
+            "valenced.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": ">=352.2"
+            },
+            "valenced.api.themes": {
+              "version": ">=1.0.1 <2"
+            }
+          }
+        },
+        "1.0.1": {
+          "url": "https://plugins.benjiisworld.com/pool/benjii.dev.theme.tokyonight@1.0.1.zip",
+          "sha256": "93f604456dba4223efd4187b723f4d3db57f3a24c42a702dadf8b53761f04922",
+          "size": 66483,
           "dependencies": {
             "valenced.api": {
               "version": ">=1 <2"
