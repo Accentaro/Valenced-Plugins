@@ -64,7 +64,7 @@ Collapse selected interface elements to make better use of screen space.
 
 ### ◈ Better You Bar
 
-Add quick-access favourites and settings buttons to the You bar.
+Add quick-access favourites, launchpad and settings buttons to the You bar.
 
 <sub>**Contributors:** Joamonca · Benjii</sub>
 
