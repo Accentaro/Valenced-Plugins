@@ -2,11 +2,11 @@
 	"format": 1,
 	"id": "dev.benjii.better-you-bar",
 	"name": "Better You Bar",
-	"description": "Adds Favorites and Settings shortcuts to the You bar.",
+	"description": "Adds Favorites, Launchpad and Settings shortcuts to the You bar.",
 	"author": "j <1356632712861192242>",
 	"contributors": ["Benjii <463702169443368970>"],
 	"icon": "StarIcon",
-	"version": "1.0.1",
+	"version": "1.1.0",
 	"dependencies": {
 		"valenced.api": {
 			"version": ">=1 <2"

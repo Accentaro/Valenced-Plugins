@@ -7,6 +7,7 @@ import type { ComponentProps } from 'react'
 
 export interface Settings {
 	showFavorites: boolean
+	showLaunchpad: boolean
 	showSettings: boolean
 	localFavorites: boolean
 	favorites: string[]
@@ -18,6 +19,7 @@ export interface Settings {
 
 export const defaults: Settings = {
 	showFavorites: true,
+	showLaunchpad: false,
 	showSettings: true,
 	localFavorites: false,
 	favorites: [],
@@ -38,6 +40,12 @@ export default function SettingsComponent({
 					label="Favorites"
 					value={settings.showFavorites}
 					onValueChange={showFavorites => jsonStorage.set({ showFavorites })}
+				/>
+				<Design.TableSwitchRow
+					label="Launchpad"
+					subLabel="Replaces the pull tab. Launchpad must be set to pull tab in Discord's settings"
+					value={settings.showLaunchpad}
+					onValueChange={showLaunchpad => jsonStorage.set({ showLaunchpad })}
 				/>
 				<Design.TableSwitchRow
 					label="Settings"

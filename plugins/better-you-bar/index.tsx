@@ -1,11 +1,15 @@
 import { Design } from '@valenced/discord/design'
 import { Stores } from '@valenced/discord/flux'
 import { RootNavigationRef } from '@valenced/discord/modules/main_tabs_v2'
-import { getModuleWithImportedPath } from '@valenced/discord/utils/modules/finders'
+import {
+	getModuleWithImportedPath,
+	lookupModuleWithImportedPath,
+} from '@valenced/discord/utils/modules/finders'
 import { lookupModule } from '@valenced/modules/finders'
 import { withProps } from '@valenced/modules/finders/filters'
 import { instead } from '@valenced/patcher'
 import { lookupGeneratedIconComponent } from '@valenced/utils/discord'
+import { View } from 'react-native'
 import { patchLocalFavorites } from './favorites'
 import SettingsComponent, { defaults } from './Settings'
 import type { DiscordModules } from '@valenced/discord/types'
@@ -62,6 +66,27 @@ export default plugin<{ jsonStorage: Settings }>({
 		}
 		patchLocalFavorites(jsonStorage, cleanup)
 		cleanup(
+			getModuleWithImportedPath<{
+				default: { type(props: object): React.ReactNode }
+			}>('modules/launchpad/native/LaunchPadPullTab.tsx', module => {
+				if (typeof module.default?.type !== 'function') {
+					plugin.reportError('Launchpad pull tab is unavailable.')
+					return
+				}
+				cleanup(
+					instead(module.default, 'type', function (args, original) {
+						const { showLaunchpad } = { ...defaults, ...jsonStorage.use() }
+						const pullTab = Reflect.apply(original, this, args)
+						return showLaunchpad ? (
+							<View style={{ display: 'none' }}>{pullTab}</View>
+						) : (
+							pullTab
+						)
+					}),
+				)
+			}),
+		)
+		cleanup(
 			getModuleWithImportedPath<{ default: Notifications }>(
 				'modules/main_tabs_v2/native/you_bar/YouBarNotificationsButton.tsx',
 				module => {
@@ -72,6 +97,7 @@ export default plugin<{ jsonStorage: Settings }>({
 					)
 					const StarIcon = lookupGeneratedIconComponent('StarIcon')
 					const SettingsIcon = lookupGeneratedIconComponent('SettingsIcon')
+					const AppsIcon = lookupGeneratedIconComponent('AppsIcon')
 					// Discord 351 accepts icon elements; the API declaration only lists asset IDs.
 					const IconButton = Design.IconButton as React.ComponentType<
 						Omit<React.ComponentProps<typeof Design.IconButton>, 'icon'> & {
@@ -110,6 +136,25 @@ export default plugin<{ jsonStorage: Settings }>({
 											}
 											accessibilityLabel="Favorites"
 											onPress={() => toggleFavorites(guilds)}
+										/>
+									)}
+									{settings.showLaunchpad && AppsIcon && (
+										<IconButton
+											size="sm"
+											variant={variant}
+											icon={
+												<AppsIcon
+													size="xs"
+													color={args[0].hasNameplate ? 'white' : undefined}
+													style={{ width: 18, height: 18 }}
+												/>
+											}
+											accessibilityLabel="Launchpad"
+											onPress={() =>
+												lookupModuleWithImportedPath<{ default(): void }>(
+													'modules/launchpad/native/showLaunchPad.tsx',
+												)[0]?.default()
+											}
 										/>
 									)}
 									{notification}
