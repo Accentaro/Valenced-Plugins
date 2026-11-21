@@ -1,3 +1,4 @@
+import { patchAddServerButton } from './addServerButton'
 import { patchAvatarDecorations } from './avatarDecorations'
 import { patchBadges } from './badges'
 import { patchBoostGoal } from './boostGoal'
@@ -6,8 +7,11 @@ import { patchDisplayNameStyles } from './displayNameStyles'
 import { patchDmActivityCards } from './dmActivityCards'
 import { patchMessageClutter } from './messageClutter'
 import { patchNameplates } from './nameplates'
+import { patchNitroLockedEmojis } from './nitroLockedEmojis'
+import { patchProfileBanners } from './profileBanners'
 import { patchProfileEffects } from './profileEffects'
 import { patchProfileFrames } from './profileFrames'
+import { patchProfileThemes } from './profileThemes'
 import { patchServerTags } from './serverTags'
 import { patchServerThemes } from './serverThemes'
 import { patchWishlist } from './wishlist'
@@ -29,4 +33,8 @@ export function patchAll(cleanup: PluginCleanupApi): void {
 	patchDisplayNameStyles(cleanup)
 	patchDmActivityCards(cleanup)
 	patchServerThemes(cleanup)
+	patchProfileBanners(cleanup)
+	patchProfileThemes(cleanup)
+	patchAddServerButton(cleanup)
+	patchNitroLockedEmojis(cleanup)
 }

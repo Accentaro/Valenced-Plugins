@@ -104,6 +104,20 @@ export default function Settings({
 						<Toggle
 							s={s}
 							set={set}
+							key_="profileBanners"
+							label="Profile Banners"
+							subLabel="Banner images on user profiles"
+						/>
+						<Toggle
+							s={s}
+							set={set}
+							key_="profileThemes"
+							label="Profile Themes"
+							subLabel="Use your app theme on profiles instead of their colors"
+						/>
+						<Toggle
+							s={s}
+							set={set}
 							key_="serverTags"
 							label="Server Tags"
 							subLabel="Clan tags in chat, DM list, and profiles"
@@ -128,6 +142,20 @@ export default function Settings({
 							key_="boostGoal"
 							label="Boost Goal"
 							subLabel="Server boost progress bar in channel list"
+						/>
+						<Toggle
+							s={s}
+							set={set}
+							key_="addServerButton"
+							label="Add Server Button"
+							subLabel="Add a Server button at the bottom of the server list"
+						/>
+						<Toggle
+							s={s}
+							set={set}
+							key_="nitroLockedEmojis"
+							label="Nitro-locked Reaction Emojis"
+							subLabel="Emojis you cannot use in the reaction picker"
 						/>
 						<Toggle
 							s={s}
