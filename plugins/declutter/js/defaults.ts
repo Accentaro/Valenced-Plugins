@@ -20,4 +20,8 @@ export const DEFAULTS: DeclutterSettings = {
 	serverThemes: false,
 	dmActivityCards: true,
 	displayNameStyles: true,
+	profileBanners: false,
+	profileThemes: false,
+	addServerButton: false,
+	nitroLockedEmojis: false,
 }
